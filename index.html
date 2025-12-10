@@ -52,12 +52,21 @@
       <div id="image-input-mode" class="input-mode" style="display: none;">
         <div class="form-group">
           <label>Upload Reference Image:</label>
-          <input type="file" id="reference-image" accept="image/*">
-          <div id="image-preview"></div>
+          <input type="file" id="reference-image" accept="image/*" onchange="previewReferenceImage(event)">>
+          <div id="image-preview" class="image-preview-container"></div>
+          <small>For character/object consistency across all variations</small>
         </div>
         <div class="form-group">
-          <label for="image-context">Additional Context:</label>
-          <input type="text" id="image-context" placeholder="e.g., product shot, maintain same style">
+          <label for="image-context">Detailed Description (Character Bible):</label>
+          <textarea id="image-context" rows="4"
+            placeholder="Describe specific details: bone structure, facial features, skin tone, proportions, textures, materials, colors, unique characteristics..."></textarea>
+          <small>💡 Tip: More detail = better consistency</small>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="lock-character" checked>
+            Lock character/object identity across all variations
+          </label>
         </div>
       </div>
 
@@ -69,6 +78,38 @@
 
     <!-- Step 3: Parameter Controls -->
     <section class="card" id="parameters-section" style="display: none;">
+      <div class="dataset-size-selector">
+        <h3>📊 Dataset Size</h3>
+        <div class="size-options">
+          <button class="size-btn active" onclick="setDatasetSize('quick', event)">
+            <span class="size-label">Quick Test</span>
+            <span class="size-number">4-8 images</span>
+            <small>~2-4 minutes</small>
+          </button>
+
+          <button class="size-btn" onclick="setDatasetSize('standard', event)">
+            <span class="size-label">Standard</span>
+            <span class="size-number">16-24 images</span>
+            <small>~8-12 minutes</small>
+          </button>
+
+          <button class="size-btn" onclick="setDatasetSize('medium', event)">
+            <span class="size-label">Medium</span>
+            <span class="size-number">32-48 images</span>
+            <small>~16-24 minutes</small>
+          </button>
+
+          <button class="size-btn" onclick="setDatasetSize('large', event)">
+            <span class="size-label">Large ML Dataset</span>
+            <span class="size-number">64-96 images</span>
+            <small>~32-48 minutes</small>
+          </button>
+        </div>
+
+        <div class="dataset-recommendation">
+          <strong>💡 Recommendation:</strong> <span id="size-recommendation">Quick Test for initial validation</span>
+        </div>
+      </div>
       <h2>🎛️ Step 2: Define Dataset Parameters</h2>
 
       <div class="preset-selector">
@@ -472,6 +513,43 @@
     let api = null;
     let baseStructuredPrompt = null;
     let datasetResults = [];
+    let referenceImageBase64 = null;
+    let currentInputMode = 'text';
+    // Preview reference image
+    function previewReferenceImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // Validate file
+      if (!file.type.startsWith('image/')) {
+        alert('Please upload an image file');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        // Store base64 WITHOUT the data:image prefix
+        const base64Data = e.target.result;
+        referenceImageBase64 = base64Data.split(',')[1];
+
+        const preview = document.getElementById('image-preview');
+        preview.innerHTML = `
+            <div class="image-preview-container">
+                <img src="${base64Data}" class="preview-image" alt="Reference">
+                <div class="preview-info">
+                    <p><strong>✅ Image Loaded</strong></p>
+                    <p>Size: ${(file.size / 1024).toFixed(2)} KB</p>
+                    <p>Type: ${file.type}</p>
+                    <small style="color: var(--success);">This image will guide all variations</small>
+                </div>
+            </div>
+        `;
+
+        console.log('Reference image loaded:', referenceImageBase64.substring(0, 50) + '...');
+      };
+      reader.readAsDataURL(file);
+    }
+
 
     // Initialize API
     function initializeAPI() {
@@ -482,9 +560,8 @@
       }
 
       api = new BriaFIBOAPI(apiKey);
-      showStatus('api-status', '✅ API initialized successfully!', 'success');
+      showStatus('api-status', '✅ Connected to Bria FIBO Engine', 'success');
 
-      // Show next section
       setTimeout(() => {
         document.getElementById('object-section').style.display = 'block';
         document.getElementById('object-section').scrollIntoView({ behavior: 'smooth' });
@@ -493,6 +570,7 @@
 
     // Switch input mode
     function switchInputMode(mode) {
+      currentInputMode = mode;
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       event.target.classList.add('active');
 
@@ -500,7 +578,7 @@
       document.getElementById('image-input-mode').style.display = mode === 'image' ? 'block' : 'none';
     }
 
-    // Generate base structured prompt
+    // Generate base structured prompt - FIXED VERSION
     async function generateBasePrompt() {
       if (!api) {
         alert('Please initialize API first');
@@ -511,13 +589,64 @@
       statusEl.innerHTML = '<div class="loading">Generating structured prompt...</div>';
 
       try {
-        const prompt = document.getElementById('object-description').value;
-        const result = await api.generateStructuredPrompt(prompt, null, (attempt, max) => {
-          statusEl.innerHTML = `<div class="loading">Processing... (${attempt}/${max})</div>`;
+        let prompt, images = null;
+
+        // Check current mode
+        if (currentInputMode === 'image') {
+          // IMAGE MODE - CRITICAL FIX
+          if (!referenceImageBase64) {
+            alert('Please upload a reference image first');
+            statusEl.innerHTML = '<div class="error">❌ No reference image uploaded</div>';
+            return;
+          }
+
+          // Get context description (character bible)
+          const context = document.getElementById('image-context').value.trim();
+
+          // Build comprehensive prompt
+          if (context) {
+            prompt = `Create variations of this subject maintaining exact visual characteristics. ${context}`;
+          } else {
+            prompt = 'Create variations of this subject, maintaining all visual characteristics, proportions, colors, textures, and identity across different camera angles and lighting conditions.';
+          }
+
+          // CRITICAL: Pass the image array
+          images = [referenceImageBase64];
+
+          console.log('Image mode - Sending:', {
+            promptLength: prompt.length,
+            imageDataLength: referenceImageBase64.length,
+            imagesArray: images.length
+          });
+
+        } else {
+          // TEXT MODE
+          prompt = document.getElementById('object-description').value.trim();
+
+          if (!prompt) {
+            alert('Please enter an object description');
+            statusEl.innerHTML = '';
+            return;
+          }
+
+          console.log('Text mode - Sending:', { prompt });
+        }
+
+        // Generate structured prompt with proper parameters
+        const result = await api.generateStructuredPrompt(prompt, images, (attempt, max) => {
+          statusEl.innerHTML = `<div class="loading">Processing with ${currentInputMode === 'image' ? 'reference image' : 'text description'}... (${attempt}/${max})</div>`;
         });
 
         baseStructuredPrompt = result.structured_prompt;
-        statusEl.innerHTML = '<div class="success">✅ Base structure generated!</div>';
+
+        // Show success with mode-specific message
+        if (currentInputMode === 'image') {
+          statusEl.innerHTML = '<div class="success">✅ Base structure generated from reference image!</div>';
+        } else {
+          statusEl.innerHTML = '<div class="success">✅ Base structure generated from description!</div>';
+        }
+
+        console.log('Structured prompt generated:', result);
 
         // Show parameters section
         setTimeout(() => {
@@ -527,6 +656,7 @@
         }, 500);
 
       } catch (error) {
+        console.error('Generation error:', error);
         statusEl.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
       }
     }
@@ -584,6 +714,66 @@
     function startOver() {
       location.reload();
     }
+    let selectedDatasetSize = 'quick';
+
+    function setDatasetSize(size, event) {
+      selectedDatasetSize = size;
+
+      // Update button states
+      document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.closest('.size-btn').classList.add('active');
+
+      // Update recommendation
+      const recommendations = {
+        'quick': 'Quick Test perfect for validation and demos',
+        'standard': 'Standard size good for initial model training',
+        'medium': 'Medium dataset suitable for small-scale ML projects',
+        'large': 'Large dataset recommended for production ML models'
+      };
+
+      document.getElementById('size-recommendation').textContent = recommendations[size];
+
+      // Auto-select appropriate parameters
+      autoConfigureForSize(size);
+    }
+
+    function autoConfigureForSize(size) {
+      // Reset all selections
+      document.querySelectorAll('#camera-angles input').forEach(cb => cb.checked = false);
+      document.querySelectorAll('#lighting-directions input').forEach(cb => cb.checked = false);
+
+      if (size === 'quick') {
+        // 2 cameras × 2 lights = 4 variations
+        ['eye-level', 'high-angle'].forEach(angle => {
+          document.querySelector(`#camera-angles input[value="${angle}"]`).checked = true;
+        });
+        ['front-lit', 'side-lit'].forEach(light => {
+          document.querySelector(`#lighting-directions input[value="${light}"]`).checked = true;
+        });
+      } else if (size === 'standard') {
+        // 4 cameras × 4 lights = 16 variations
+        document.querySelectorAll('#camera-angles input').forEach(cb => cb.checked = true);
+        document.querySelectorAll('#lighting-directions input').forEach(cb => cb.checked = true);
+      } else if (size === 'medium') {
+        // 4 cameras × 4 lights × 2 backgrounds = 32 variations
+        document.querySelectorAll('#camera-angles input').forEach(cb => cb.checked = true);
+        document.querySelectorAll('#lighting-directions input').forEach(cb => cb.checked = true);
+        // User can toggle advanced params for more variations
+      } else if (size === 'large') {
+        // Maximum combinations
+        document.querySelectorAll('#camera-angles input').forEach(cb => cb.checked = true);
+        document.querySelectorAll('#lighting-directions input').forEach(cb => cb.checked = true);
+        // Suggest enabling advanced parameters
+        alert('💡 For 64-96 images, consider enabling Advanced Parameters and using multiple backgrounds/focal lengths');
+      }
+
+      updateVariationCount();
+    }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', () => {
+      setDatasetSize('quick', { target: document.querySelector('.size-btn') });
+    });
   </script>
 </body>
 
