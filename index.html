@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FIBO DataForge - Synthetic Dataset Generator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <h1 class="logo">📦 FIBO DataForge</h1>
+      <p class="tagline">Structured Synthetic Dataset Generator</p>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container">
+    <!-- Step 1: API Setup -->
+    <section class="card" id="setup-section">
+      <h2>⚙️ Setup</h2>
+      <div class="form-group">
+        <label for="api-key">Bria API Key:</label>
+        <input type="password" id="api-key" placeholder="Paste your API key">
+        <small>Get your key from <a href="https://platform.bria.ai/console/account/api-keys" target="_blank">Bria
+            Platform</a></small>
+      </div>
+      <button class="btn btn-primary" onclick="initializeAPI()">Initialize API</button>
+      <div id="api-status" class="status-message"></div>
+    </section>
+
+    <!-- Step 2: Object Description -->
+    <section class="card" id="object-section" style="display: none;">
+      <h2>📝 Step 1: Describe Your Object</h2>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchInputMode('text')">Text Description</button>
+        <button class="tab" onclick="switchInputMode('image')">Reference Image</button>
+      </div>
+
+      <div id="text-input-mode" class="input-mode">
+        <div class="form-group">
+          <label for="object-description">Object Description:</label>
+          <input type="text" id="object-description" placeholder="e.g., a red ceramic coffee mug"
+            value="a red ceramic coffee mug">
+        </div>
+      </div>
+
+      <div id="image-input-mode" class="input-mode" style="display: none;">
+        <div class="form-group">
+          <label>Upload Reference Image:</label>
+          <input type="file" id="reference-image" accept="image/*">
+          <div id="image-preview"></div>
+        </div>
+        <div class="form-group">
+          <label for="image-context">Additional Context:</label>
+          <input type="text" id="image-context" placeholder="e.g., product shot, maintain same style">
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="generateBasePrompt()">
+        Generate Base Structure →
+      </button>
+      <div id="base-generation-status"></div>
+    </section>
+
+    <!-- Step 3: Parameter Controls -->
+    <section class="card" id="parameters-section" style="display: none;">
+      <h2>🎛️ Step 2: Define Dataset Parameters</h2>
+
+      <div class="preset-selector">
+        <label>Quick Presets:</label>
+        <select id="preset-select" onchange="applyPreset()">
+          <option value="">Custom Configuration</option>
+          <option value="product_photography">Product Photography (4 angles)</option>
+          <option value="lighting_study">Lighting Study (4 directions)</option>
+          <option value="multi_angle">Multi-Angle Dataset (4 views)</option>
+        </select>
+      </div>
+
+      <div class="parameters-grid">
+        <!-- Camera Parameters -->
+        <div class="param-group">
+          <h3>📷 Camera</h3>
+          <div class="checkbox-group" id="camera-angles">
+            <label><input type="checkbox" value="eye-level" checked> Eye Level</label>
+            <label><input type="checkbox" value="high-angle"> High Angle</label>
+            <label><input type="checkbox" value="low-angle"> Low Angle</label>
+            <label><input type="checkbox" value="overhead"> Overhead</label>
+          </div>
+        </div>
+
+        <!-- Lighting Parameters -->
+        <div class="param-group">
+          <h3>💡 Lighting</h3>
+          <div class="checkbox-group" id="lighting-directions">
+            <label><input type="checkbox" value="front-lit" checked> Front Light</label>
+            <label><input type="checkbox" value="side-lit"> Side Light</label>
+            <label><input type="checkbox" value="back-lit"> Back Light</label>
+            <label><input type="checkbox" value="top-lit"> Top Light</label>
+          </div>
+        </div>
+
+        <!-- Background Parameters -->
+        <div class="param-group">
+          <h3>🎨 Background</h3>
+          <div class="radio-group" id="backgrounds">
+            <label><input type="radio" name="background" value="white-studio" checked> White Studio</label>
+            <label><input type="radio" name="background" value="black-studio"> Black Studio</label>
+            <label><input type="radio" name="background" value="wooden-surface"> Wooden Surface</label>
+            <label><input type="radio" name="background" value="fabric-texture"> Fabric</label>
+          </div>
+        </div>
+
+        <!-- Focal Length -->
+        <div class="param-group">
+          <h3>🔍 Focal Length</h3>
+          <div class="radio-group" id="focal-lengths">
+            <label><input type="radio" name="focal-length" value="wide-angle"> Wide (24mm)</label>
+            <label><input type="radio" name="focal-length" value="standard" checked> Standard (50mm)</label>
+            <label><input type="radio" name="focal-length" value="portrait"> Portrait (85mm)</label>
+            <label><input type="radio" name="focal-length" value="telephoto"> Telephoto (135mm)</label>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Advanced Parameters Accordion -->
+      <div class="advanced-params-section">
+        <button class="accordion-toggle" onclick="toggleAdvancedParams()">
+          ⚙️ Advanced Parameters (Optional)
+          <span class="toggle-icon">▼</span>
+        </button>
+
+        <div id="advanced-params-content" class="accordion-content" style="display: none;">
+
+          <!-- Color Control -->
+          <div class="param-group">
+            <h3>🎨 Color Control</h3>
+            <label>
+              <input type="checkbox" id="use-exact-colors">
+              Use Exact Colors (Hex)
+            </label>
+            <div id="color-inputs" style="display: none; margin-top: 10px;">
+              <div class="color-input-row">
+                <label>Background Color:</label>
+                <input type="color" id="bg-color" value="#FFFFFF">
+                <input type="text" id="bg-color-hex" value="#FFFFFF" placeholder="#FFFFFF">
+              </div>
+              <div class="color-input-row">
+                <label>Surface Color:</label>
+                <input type="color" id="surface-color" value="#8B7355">
+                <input type="text" id="surface-color-hex" value="#8B7355" placeholder="#8B7355">
+              </div>
+            </div>
+          </div>
+
+          <!-- Surface & Material -->
+          <div class="param-group">
+            <h3>🪵 Surface & Material</h3>
+            <div class="form-group">
+              <label>Surface Finish:</label>
+              <select id="surface-finish">
+                <option value="matte">Matte</option>
+                <option value="glossy">Glossy</option>
+                <option value="satin">Satin</option>
+                <option value="unglazed">Unglazed</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Surface Tone:</label>
+              <select id="surface-tone">
+                <option value="neutral">Neutral</option>
+                <option value="warm">Warm</option>
+                <option value="cool">Cool</option>
+                <option value="dark">Dark</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Lighting Detail -->
+          <div class="param-group">
+            <h3>💡 Lighting Detail</h3>
+            <div class="form-group">
+              <label>Contrast:</label>
+              <select id="lighting-contrast">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Shadow Behavior:</label>
+              <select id="shadow-behavior">
+                <option value="soft edge" selected>Soft Edge</option>
+                <option value="hard edge">Hard Edge</option>
+                <option value="minimal">Minimal</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Color Temperature:</label>
+              <select id="color-temperature">
+                <option value="neutral-warm" selected>Neutral Warm</option>
+                <option value="neutral-cool">Neutral Cool</option>
+                <option value="warm">Warm</option>
+                <option value="cool">Cool</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Camera Technical -->
+          <div class="param-group">
+            <h3>📷 Camera Technical</h3>
+            <div class="form-group">
+              <label>Aperture (f-stop):</label>
+              <select id="aperture">
+                <option value="1.4">f/1.4 (Very Shallow)</option>
+                <option value="2.8">f/2.8 (Shallow)</option>
+                <option value="4.5" selected>f/4.5 (Medium)</option>
+                <option value="8">f/8 (Deep)</option>
+                <option value="16">f/16 (Very Deep)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Distance:</label>
+              <select id="camera-distance">
+                <option value="close">Close-up</option>
+                <option value="mid" selected>Mid-distance</option>
+                <option value="far">Far</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Composition -->
+          <div class="param-group">
+            <h3>📐 Composition</h3>
+            <div class="form-group">
+              <label>Negative Space:</label>
+              <select id="negative-space">
+                <option value="minimal">Minimal</option>
+                <option value="medium" selected>Medium</option>
+                <option value="generous">Generous</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Camera Height:</label>
+              <select id="camera-height-detail">
+                <option value="low">Low (Below Subject)</option>
+                <option value="eye-level" selected>Eye-Level</option>
+                <option value="high">High (Above Subject)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Realism & Imperfections -->
+          <div class="param-group">
+            <h3>✨ Realism & Detail</h3>
+            <label>
+              <input type="checkbox" id="add-imperfections" checked>
+              Add Realistic Imperfections
+            </label>
+            <div id="imperfection-types" style="margin-top: 10px;">
+              <label><input type="checkbox" value="fingerprints" checked> Fingerprints</label>
+              <label><input type="checkbox" value="tool marks" checked> Tool Marks</label>
+              <label><input type="checkbox" value="uneven edges" checked> Uneven Edges</label>
+              <label><input type="checkbox" value="slight scratches"> Slight Scratches</label>
+              <label><input type="checkbox" value="patina"> Patina/Age Marks</label>
+            </div>
+          </div>
+
+          <!-- Mood -->
+          <div class="param-group">
+            <h3>🎭 Mood</h3>
+            <div class="checkbox-group" id="mood-options">
+              <label><input type="checkbox" value="calm"> Calm</label>
+              <label><input type="checkbox" value="luxurious"> Luxurious</label>
+              <label><input type="checkbox" value="dramatic"> Dramatic</label>
+              <label><input type="checkbox" value="playful"> Playful</label>
+              <label><input type="checkbox" value="professional"> Professional</label>
+              <label><input type="checkbox" value="cozy"> Cozy</label>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <style>
+        /* Advanced Parameters Styling */
+        .advanced-params-section {
+          margin: 30px 0;
+          border-top: 2px solid var(--border);
+          padding-top: 20px;
+        }
+
+        .accordion-toggle {
+          width: 100%;
+          background: var(--bg-dark);
+          border: 2px solid var(--border);
+          border-radius: 8px;
+          padding: 15px 20px;
+          color: var(--text-primary);
+          font-size: 1.1rem;
+          font-weight: 600;
+          cursor: pointer;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          transition: all 0.3s;
+        }
+
+        .accordion-toggle:hover {
+          border-color: var(--primary);
+          background: rgba(37, 99, 235, 0.1);
+        }
+
+        .toggle-icon {
+          transition: transform 0.3s;
+        }
+
+        .accordion-toggle.active .toggle-icon {
+          transform: rotate(180deg);
+        }
+
+        .accordion-content {
+          margin-top: 20px;
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 20px;
+        }
+
+        .color-input-row {
+          display: flex;
+          gap: 10px;
+          align-items: center;
+          margin-bottom: 10px;
+        }
+
+        .color-input-row label {
+          flex: 0 0 140px;
+        }
+
+        .color-input-row input[type="color"] {
+          width: 60px;
+          height: 40px;
+          border: 2px solid var(--border);
+          border-radius: 6px;
+          cursor: pointer;
+        }
+
+        .color-input-row input[type="text"] {
+          flex: 1;
+          padding: 8px;
+          font-family: monospace;
+        }
+
+        #imperfection-types label {
+          display: block;
+          padding: 6px 0;
+        }
+      </style>
+
+      <script>
+        // Toggle advanced parameters
+        function toggleAdvancedParams() {
+          const content = document.getElementById('advanced-params-content');
+          const button = event.target.closest('.accordion-toggle');
+
+          if (content.style.display === 'none') {
+            content.style.display = 'grid';
+            button.classList.add('active');
+          } else {
+            content.style.display = 'none';
+            button.classList.remove('active');
+          }
+        }
+
+        // Color picker sync
+        document.addEventListener('DOMContentLoaded', () => {
+          const useColors = document.getElementById('use-exact-colors');
+          const colorInputs = document.getElementById('color-inputs');
+
+          useColors?.addEventListener('change', (e) => {
+            colorInputs.style.display = e.target.checked ? 'block' : 'none';
+          });
+
+          // Sync color picker with hex input
+          const syncColor = (colorId, hexId) => {
+            const colorPicker = document.getElementById(colorId);
+            const hexInput = document.getElementById(hexId);
+
+            colorPicker?.addEventListener('input', (e) => {
+              hexInput.value = e.target.value.toUpperCase();
+            });
+
+            hexInput?.addEventListener('input', (e) => {
+              if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+                colorPicker.value = e.target.value;
+              }
+            });
+          };
+
+          syncColor('bg-color', 'bg-color-hex');
+          syncColor('surface-color', 'surface-color-hex');
+        });
+      </script>
+
+      <div class="generation-summary">
+        <p>Dataset will contain: <strong id="total-variations">0</strong> variations</p>
+        <p>Estimated time: <strong id="estimated-time">0</strong> minutes</p>
+      </div>
+
+      <button class="btn btn-success btn-large" onclick="startDatasetGeneration()">
+        🚀 Generate Dataset
+      </button>
+    </section>
+
+    <!-- Step 4: Generation Progress -->
+    <section class="card" id="progress-section" style="display: none;">
+      <h2>⏳ Generating Dataset...</h2>
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <p class="progress-text" id="progress-text">Initializing...</p>
+
+      <div class="current-variation" id="current-variation"></div>
+    </section>
+
+    <!-- Step 5: Results Gallery -->
+    <section class="card" id="results-section" style="display: none;">
+      <h2>✅ Dataset Complete!</h2>
+
+      <div class="results-actions">
+        <button class="btn btn-success" onclick="downloadDataset()">
+          📥 Download Dataset (ZIP)
+        </button>
+        <button class="btn btn-secondary" onclick="viewMetadata()">
+          📊 View All Metadata
+        </button>
+        <button class="btn btn-secondary" onclick="startOver()">
+          🔄 Generate Another Dataset
+        </button>
+      </div>
+
+      <div class="gallery" id="results-gallery"></div>
+    </section>
+
+    <!-- Metadata Viewer Modal -->
+    <div id="metadata-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <span class="close" onclick="closeMetadataModal()">&times;</span>
+        <h2>📋 Dataset Metadata</h2>
+        <pre id="metadata-viewer"></pre>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Powered by <strong>Bria FIBO</strong> | Built for Bria FIBO Hackathon 2025</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="api.js"></script>
+  <script src="generator.js"></script>
+  <script src="exporter.js"></script>
+  <script>
+    // Global state
+    let api = null;
+    let baseStructuredPrompt = null;
+    let datasetResults = [];
+
+    // Initialize API
+    function initializeAPI() {
+      const apiKey = document.getElementById('api-key').value.trim();
+      if (!apiKey) {
+        showStatus('api-status', 'Please enter an API key', 'error');
+        return;
+      }
+
+      api = new BriaFIBOAPI(apiKey);
+      showStatus('api-status', '✅ API initialized successfully!', 'success');
+
+      // Show next section
+      setTimeout(() => {
+        document.getElementById('object-section').style.display = 'block';
+        document.getElementById('object-section').scrollIntoView({ behavior: 'smooth' });
+      }, 500);
+    }
+
+    // Switch input mode
+    function switchInputMode(mode) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+
+      document.getElementById('text-input-mode').style.display = mode === 'text' ? 'block' : 'none';
+      document.getElementById('image-input-mode').style.display = mode === 'image' ? 'block' : 'none';
+    }
+
+    // Generate base structured prompt
+    async function generateBasePrompt() {
+      if (!api) {
+        alert('Please initialize API first');
+        return;
+      }
+
+      const statusEl = document.getElementById('base-generation-status');
+      statusEl.innerHTML = '<div class="loading">Generating structured prompt...</div>';
+
+      try {
+        const prompt = document.getElementById('object-description').value;
+        const result = await api.generateStructuredPrompt(prompt, null, (attempt, max) => {
+          statusEl.innerHTML = `<div class="loading">Processing... (${attempt}/${max})</div>`;
+        });
+
+        baseStructuredPrompt = result.structured_prompt;
+        statusEl.innerHTML = '<div class="success">✅ Base structure generated!</div>';
+
+        // Show parameters section
+        setTimeout(() => {
+          document.getElementById('parameters-section').style.display = 'block';
+          document.getElementById('parameters-section').scrollIntoView({ behavior: 'smooth' });
+          updateVariationCount();
+        }, 500);
+
+      } catch (error) {
+        statusEl.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+      }
+    }
+
+    // Update variation count
+    function updateVariationCount() {
+      const cameras = document.querySelectorAll('#camera-angles input:checked').length;
+      const lights = document.querySelectorAll('#lighting-directions input:checked').length;
+      const total = cameras * lights;
+
+      document.getElementById('total-variations').textContent = total;
+      document.getElementById('estimated-time').textContent = Math.ceil(total * 0.5); // ~30s per image
+    }
+
+    // Add event listeners to checkboxes
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('#camera-angles input, #lighting-directions input').forEach(cb => {
+        cb.addEventListener('change', updateVariationCount);
+      });
+    });
+
+    // Apply preset
+    function applyPreset() {
+      const preset = document.getElementById('preset-select').value;
+      if (!preset) return;
+
+      // Reset all
+      document.querySelectorAll('#camera-angles input').forEach(cb => cb.checked = false);
+      document.querySelectorAll('#lighting-directions input').forEach(cb => cb.checked = false);
+
+      if (preset === 'product_photography') {
+        ['eye-level', 'high-angle', 'overhead'].forEach(v => {
+          document.querySelector(`#camera-angles input[value="${v}"]`).checked = true;
+        });
+        document.querySelector('#lighting-directions input[value="front-lit"]').checked = true;
+      } else if (preset === 'lighting_study') {
+        document.querySelector('#camera-angles input[value="eye-level"]').checked = true;
+        document.querySelectorAll('#lighting-directions input').forEach(cb => cb.checked = true);
+      } else if (preset === 'multi_angle') {
+        document.querySelectorAll('#camera-angles input').forEach(cb => cb.checked = true);
+        document.querySelector('#lighting-directions input[value="front-lit"]').checked = true;
+      }
+
+      updateVariationCount();
+    }
+
+    // Helper function
+    function showStatus(elementId, message, type) {
+      const el = document.getElementById(elementId);
+      el.className = `status-message ${type}`;
+      el.textContent = message;
+    }
+
+    // Start over
+    function startOver() {
+      location.reload();
+    }
+  </script>
+</body>
+
+</html>
