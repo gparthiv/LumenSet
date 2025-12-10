@@ -1,0 +1,146 @@
+{
+  "camera_angles": [
+    { "id": "eye-level", "name": "Eye Level", "description": "Camera at subject's eye height" },
+    { "id": "high-angle", "name": "High Angle", "description": "Camera looking down at subject" },
+    { "id": "low-angle", "name": "Low Angle", "description": "Camera looking up at subject" },
+    { "id": "overhead", "name": "Overhead", "description": "Bird's eye view from above" }
+  ],
+  
+  "lighting_directions": [
+    { "id": "front-lit", "name": "Front Light", "description": "Light from camera direction" },
+    { "id": "side-lit", "name": "Side Light", "description": "Light from left or right" },
+    { "id": "back-lit", "name": "Back Light", "description": "Light from behind subject" },
+    { "id": "top-lit", "name": "Top Light", "description": "Light from directly above" }
+  ],
+  
+  "focal_lengths": [
+    { "id": "wide-angle", "name": "Wide (24mm)", "description": "Expansive view, slight distortion" },
+    { "id": "standard", "name": "Standard (50mm)", "description": "Natural perspective" },
+    { "id": "portrait", "name": "Portrait (85mm)", "description": "Flattering compression" },
+    { "id": "telephoto", "name": "Telephoto (135mm)", "description": "Strong compression" }
+  ],
+  
+  "backgrounds": [
+    { "id": "white-studio", "name": "White Studio", "description": "Clean seamless white backdrop" },
+    { "id": "black-studio", "name": "Black Studio", "description": "Dramatic black backdrop" },
+    { "id": "wooden-surface", "name": "Wooden Surface", "description": "Natural wood texture" },
+    { "id": "fabric-texture", "name": "Fabric Texture", "description": "Soft textured fabric" }
+  ],
+  
+  "lighting_quality": [
+    { "id": "soft", "name": "Soft Light", "description": "Diffused, gentle shadows" },
+    { "id": "hard", "name": "Hard Light", "description": "Sharp, defined shadows" }
+  ],
+  
+  "depth_of_field": [
+    { "id": "shallow", "name": "Shallow DOF", "description": "Subject sharp, background blurred" },
+    { "id": "deep", "name": "Deep DOF", "description": "Everything in focus" }
+  ],
+  
+  "presets": {
+    "product_photography": {
+      "name": "Product Photography",
+      "description": "Clean studio shots for e-commerce",
+      "variations": [
+        {
+          "name": "Front View",
+          "camera_angle": "eye-level",
+          "lighting": "front-lit",
+          "background": "white-studio",
+          "focal_length": "standard"
+        },
+        {
+          "name": "3/4 View",
+          "camera_angle": "high-angle",
+          "lighting": "side-lit",
+          "background": "white-studio",
+          "focal_length": "standard"
+        },
+        {
+          "name": "Detail Shot",
+          "camera_angle": "eye-level",
+          "lighting": "side-lit",
+          "background": "white-studio",
+          "focal_length": "portrait"
+        },
+        {
+          "name": "Overhead",
+          "camera_angle": "overhead",
+          "lighting": "top-lit",
+          "background": "white-studio",
+          "focal_length": "standard"
+        }
+      ]
+    },
+    
+    "lighting_study": {
+      "name": "Lighting Study",
+      "description": "Same object, different lighting",
+      "variations": [
+        {
+          "name": "Front Lit",
+          "camera_angle": "eye-level",
+          "lighting": "front-lit",
+          "background": "white-studio",
+          "focal_length": "standard"
+        },
+        {
+          "name": "Side Lit",
+          "camera_angle": "eye-level",
+          "lighting": "side-lit",
+          "background": "white-studio",
+          "focal_length": "standard"
+        },
+        {
+          "name": "Back Lit",
+          "camera_angle": "eye-level",
+          "lighting": "back-lit",
+          "background": "white-studio",
+          "focal_length": "standard"
+        },
+        {
+          "name": "Top Lit",
+          "camera_angle": "eye-level",
+          "lighting": "top-lit",
+          "background": "white-studio",
+          "focal_length": "standard"
+        }
+      ]
+    },
+    
+    "multi_angle": {
+      "name": "Multi-Angle Dataset",
+      "description": "All angles of one object",
+      "variations": [
+        {
+          "name": "Eye Level",
+          "camera_angle": "eye-level",
+          "lighting": "front-lit",
+          "background": "white-studio",
+          "focal_length": "standard"
+        },
+        {
+          "name": "High Angle",
+          "camera_angle": "high-angle",
+          "lighting": "front-lit",
+          "background": "white-studio",
+          "focal_length": "standard"
+        },
+        {
+          "name": "Low Angle",
+          "camera_angle": "low-angle",
+          "lighting": "front-lit",
+          "background": "white-studio",
+          "focal_length": "standard"
+        },
+        {
+          "name": "Overhead",
+          "camera_angle": "overhead",
+          "lighting": "top-lit",
+          "background": "white-studio",
+          "focal_length": "standard"
+        }
+      ]
+    }
+  }
+}
