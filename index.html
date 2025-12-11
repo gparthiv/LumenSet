@@ -2,10 +2,10 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FIBO DataForge - Synthetic Dataset Generator</title>
-  <link rel="stylesheet" href="style2.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
@@ -67,7 +67,8 @@
       <div id="image-input-mode" class="input-mode" style="display: none;">
         <div class="form-group">
           <label>Upload Reference Image:</label>
-          <input type="file" id="reference-image" accept="image/*" onchange="previewReferenceImage(event)">>
+          <!-- fixed stray extra > -->
+          <input type="file" id="reference-image" accept="image/*" onchange="previewReferenceImage(event)">
           <div id="image-preview" class="image-preview-container"></div>
           <small>✨ For maximum consistency: Upload clear, well-lit reference photo</small>
         </div>
@@ -91,25 +92,26 @@
       <div class="dataset-size-selector">
         <h3>📊 Dataset Size</h3>
         <div class="size-options">
-          <button class="size-btn active" onclick="setDatasetSize('quick', event)">
+          <!-- data-size attributes added for programmatic wiring -->
+          <button class="size-btn active" data-size="quick" onclick="setDatasetSize('quick', event)">
             <span class="size-label">Quick Test</span>
             <span class="size-number">4-8 images</span>
             <small>~2-4 minutes</small>
           </button>
 
-          <button class="size-btn" onclick="setDatasetSize('standard', event)">
+          <button class="size-btn" data-size="standard" onclick="setDatasetSize('standard', event)">
             <span class="size-label">Standard</span>
             <span class="size-number">16-24 images</span>
             <small>~8-12 minutes</small>
           </button>
 
-          <button class="size-btn" onclick="setDatasetSize('medium', event)">
+          <button class="size-btn" data-size="medium" onclick="setDatasetSize('medium', event)">
             <span class="size-label">Medium</span>
             <span class="size-number">32-48 images</span>
             <small>~16-24 minutes</small>
           </button>
 
-          <button class="size-btn" onclick="setDatasetSize('large', event)">
+          <button class="size-btn" data-size="large" onclick="setDatasetSize('large', event)">
             <span class="size-label">Large ML Dataset</span>
             <span class="size-number">64-96 images</span>
             <small>~32-48 minutes</small>
@@ -120,6 +122,7 @@
           <strong>💡 Recommendation:</strong> <span id="size-recommendation">Quick Test for initial validation</span>
         </div>
       </div>
+
       <h2>🎛️ Step 2: Define Dataset Parameters</h2>
 
       <div class="preset-selector">
@@ -233,42 +236,45 @@
           <h3>💡 Lighting Directions</h3>
           <p class="control-description">Select one or multiple lighting directions for your dataset</p>
 
-          <div class="lighting-presets">
-            <label>
-              <input type="checkbox" name="lighting" value="front-lit" checked onchange="updateAngleSweepCount()">
-              <span class="preset-card">
-                <span class="preset-icon">☀️</span>
-                <strong>Front Light</strong>
-                <small>Even illumination</small>
-              </span>
-            </label>
+          <!-- WRAPPER: lighting-presets is kept for UI, but we also provide an id="lighting-directions" for scripts -->
+          <div id="lighting-directions">
+            <div class="lighting-presets">
+              <label>
+                <input type="checkbox" name="lighting" value="front-lit" checked onchange="updateAngleSweepCount()">
+                <span class="preset-card">
+                  <span class="preset-icon">☀️</span>
+                  <strong>Front Light</strong>
+                  <small>Even illumination</small>
+                </span>
+              </label>
 
-            <label>
-              <input type="checkbox" name="lighting" value="side-lit" onchange="updateAngleSweepCount()">
-              <span class="preset-card">
-                <span class="preset-icon">🌓</span>
-                <strong>Side Light</strong>
-                <small>Dramatic shadows</small>
-              </span>
-            </label>
+              <label>
+                <input type="checkbox" name="lighting" value="side-lit" onchange="updateAngleSweepCount()">
+                <span class="preset-card">
+                  <span class="preset-icon">🌓</span>
+                  <strong>Side Light</strong>
+                  <small>Dramatic shadows</small>
+                </span>
+              </label>
 
-            <label>
-              <input type="checkbox" name="lighting" value="back-lit" onchange="updateAngleSweepCount()">
-              <span class="preset-card">
-                <span class="preset-icon">🌅</span>
-                <strong>Back Light</strong>
-                <small>Rim lighting</small>
-              </span>
-            </label>
+              <label>
+                <input type="checkbox" name="lighting" value="back-lit" onchange="updateAngleSweepCount()">
+                <span class="preset-card">
+                  <span class="preset-icon">🌅</span>
+                  <strong>Back Light</strong>
+                  <small>Rim lighting</small>
+                </span>
+              </label>
 
-            <label>
-              <input type="checkbox" name="lighting" value="top-lit" onchange="updateAngleSweepCount()">
-              <span class="preset-card">
-                <span class="preset-icon">💡</span>
-                <strong>Top Light</strong>
-                <small>Overhead</small>
-              </span>
-            </label>
+              <label>
+                <input type="checkbox" name="lighting" value="top-lit" onchange="updateAngleSweepCount()">
+                <span class="preset-card">
+                  <span class="preset-icon">💡</span>
+                  <strong>Top Light</strong>
+                  <small>Overhead</small>
+                </span>
+              </label>
+            </div>
           </div>
 
           <div class="lighting-summary">
@@ -301,7 +307,6 @@
         </div>
       </div>
 
-
       <!-- Advanced Parameters Accordion -->
       <div class="advanced-params-section">
         <button class="accordion-toggle" onclick="toggleAdvancedParams()">
@@ -310,7 +315,7 @@
         </button>
 
         <div id="advanced-params-content" class="accordion-content" style="display: none;">
-
+          <!-- (same advanced params markup — unchanged) -->
           <!-- Color Control -->
           <div class="param-group">
             <h3>🎨 Color Control</h3>
@@ -457,129 +462,8 @@
               <label><input type="checkbox" value="cozy"> Cozy</label>
             </div>
           </div>
-
         </div>
       </div>
-
-      <style>
-        /* Advanced Parameters Styling */
-        .advanced-params-section {
-          margin: 30px 0;
-          border-top: 2px solid var(--border);
-          padding-top: 20px;
-        }
-
-        .accordion-toggle {
-          width: 100%;
-          background: var(--bg-dark);
-          border: 2px solid var(--border);
-          border-radius: 8px;
-          padding: 15px 20px;
-          color: var(--text-primary);
-          font-size: 1.1rem;
-          font-weight: 600;
-          cursor: pointer;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          transition: all 0.3s;
-        }
-
-        .accordion-toggle:hover {
-          border-color: var(--primary);
-          background: rgba(37, 99, 235, 0.1);
-        }
-
-        .toggle-icon {
-          transition: transform 0.3s;
-        }
-
-        .accordion-toggle.active .toggle-icon {
-          transform: rotate(180deg);
-        }
-
-        .accordion-content {
-          margin-top: 20px;
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 20px;
-        }
-
-        .color-input-row {
-          display: flex;
-          gap: 10px;
-          align-items: center;
-          margin-bottom: 10px;
-        }
-
-        .color-input-row label {
-          flex: 0 0 140px;
-        }
-
-        .color-input-row input[type="color"] {
-          width: 60px;
-          height: 40px;
-          border: 2px solid var(--border);
-          border-radius: 6px;
-          cursor: pointer;
-        }
-
-        .color-input-row input[type="text"] {
-          flex: 1;
-          padding: 8px;
-          font-family: monospace;
-        }
-
-        #imperfection-types label {
-          display: block;
-          padding: 6px 0;
-        }
-      </style>
-
-      <script>
-        // Toggle advanced parameters
-        function toggleAdvancedParams() {
-          const content = document.getElementById('advanced-params-content');
-          const button = event.target.closest('.accordion-toggle');
-
-          if (content.style.display === 'none') {
-            content.style.display = 'grid';
-            button.classList.add('active');
-          } else {
-            content.style.display = 'none';
-            button.classList.remove('active');
-          }
-        }
-
-        // Color picker sync
-        document.addEventListener('DOMContentLoaded', () => {
-          const useColors = document.getElementById('use-exact-colors');
-          const colorInputs = document.getElementById('color-inputs');
-
-          useColors?.addEventListener('change', (e) => {
-            colorInputs.style.display = e.target.checked ? 'block' : 'none';
-          });
-
-          // Sync color picker with hex input
-          const syncColor = (colorId, hexId) => {
-            const colorPicker = document.getElementById(colorId);
-            const hexInput = document.getElementById(hexId);
-
-            colorPicker?.addEventListener('input', (e) => {
-              hexInput.value = e.target.value.toUpperCase();
-            });
-
-            hexInput?.addEventListener('input', (e) => {
-              if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
-                colorPicker.value = e.target.value;
-              }
-            });
-          };
-
-          syncColor('bg-color', 'bg-color-hex');
-          syncColor('surface-color', 'surface-color-hex');
-        });
-      </script>
 
       <div class="generation-summary">
         <p>Dataset will contain: <strong id="total-variations">0</strong> variations</p>
@@ -638,11 +522,21 @@
     <p><small>Powered by Bria FIBO AI | Built for ML Professionals | © 2025</small></p>
   </footer>
 
-  <!-- Scripts -->
-  <script src="api2.js"></script>
-  <script src="generator2.js"></script>
-  <script src="exporter.js"></script>
+  <!-- Hidden compatibility block for older functions that reference camera-angles -->
+  <!-- This keeps your UI intact but provides the inputs those functions expect -->
+  <div id="camera-angles" style="display:none;">
+    <label><input type="checkbox" value="eye-level" checked> eye-level</label>
+    <label><input type="checkbox" value="high-angle"> high-angle</label>
+    <label><input type="checkbox" value="low-angle"> low-angle</label>
+    <label><input type="checkbox" value="overhead"> overhead</label>
+  </div>
+
+  <!-- Scripts (config first so window.CONFIG exists) -->
   <script src="config.js"></script>
+  <script src="api.js"></script>
+  <script src="generator.js"></script>
+  <script src="exporter.js"></script>
+
   <script>
     // Global state
     let api = null;
@@ -650,12 +544,13 @@
     let datasetResults = [];
     let referenceImageBase64 = null;
     let currentInputMode = 'text';
+    let selectedDatasetSize = 'quick';
+
     // Preview reference image
     function previewReferenceImage(event) {
       const file = event.target.files[0];
       if (!file) return;
 
-      // Validate file
       if (!file.type.startsWith('image/')) {
         alert('Please upload an image file');
         return;
@@ -663,7 +558,6 @@
 
       const reader = new FileReader();
       reader.onload = function (e) {
-        // Store base64 WITHOUT the data:image prefix
         const base64Data = e.target.result;
         referenceImageBase64 = base64Data.split(',')[1];
 
@@ -679,54 +573,89 @@
                 </div>
             </div>
         `;
-
         console.log('Reference image loaded:', referenceImageBase64.substring(0, 50) + '...');
       };
       reader.readAsDataURL(file);
     }
 
+    // DOM ready initialization (single place)
     document.addEventListener('DOMContentLoaded', () => {
-      if (window.CONFIG && window.CONFIG.BRIA_API_KEY !== 'YOUR_API_KEY_HERE') {
+      // init API automatically if config provided
+      if (window.CONFIG && window.CONFIG.BRIA_API_KEY && !window.CONFIG.BRIA_API_KEY.includes('YOUR_API_KEY')) {
         api = new BriaFIBOAPI(window.CONFIG.BRIA_API_KEY);
         console.log('✅ API initialized automatically');
-
-        // Show object section immediately
         document.getElementById('object-section').style.display = 'block';
       } else {
-        alert('⚠️ API Key not configured. Please update config.js with your Bria API key.');
+        console.warn('⚠️ BRIA_API_KEY not configured or default placeholder detected.');
+        // keep object-section hidden; user can still init manually via UI if you add that later
       }
 
-      // Other initialization...
+      // initial preview and counts
+      updateCameraPreview();
+      updateAngleSweepCount();
+
+      // wire sweep checkboxes
+      ['enable-rotation-sweep', 'enable-tilt-sweep', 'enable-zoom-sweep'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', updateAngleSweepCount);
+      });
+
+      // sliders
+      ['rotation-slider', 'tilt-slider', 'zoom-slider'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', () => {
+          updateCameraPreview();
+          updateAngleSweepCount();
+          // manual change by user should release preset lock (if any)
+          // keep selectedDatasetSize but do not force override after manual change
+        });
+      });
+
+      // lighting checkboxes
+      document.querySelectorAll('.lighting-presets input[type="checkbox"], #lighting-directions input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', updateAngleSweepCount);
+      });
+
+      // wire dataset-size buttons programmatically (they already have onclick, but ensure data-size support)
+      document.querySelectorAll('.size-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          // ensure event.target.closest works for nested spans/buttons
+          const ds = btn.dataset.size || btn.getAttribute('data-size') || 'quick';
+          setDatasetSize(ds, e);
+        });
+      });
+
+      // wire preset-select
+      const presetSelect = document.getElementById('preset-select');
+      if (presetSelect) presetSelect.addEventListener('change', applyPreset);
+
+      // HEX color picker toggle
+      const uec = document.getElementById('use-exact-colors');
+      if (uec) {
+        uec.addEventListener('change', () => {
+          const colorInputs = document.getElementById('color-inputs');
+          if (colorInputs) {
+            colorInputs.style.display = uec.checked ? 'block' : 'none';
+          }
+        });
+      }
+
     });
 
-    // Initialize API
-    function initializeAPI() {
-      const apiKey = document.getElementById('api-key').value.trim();
-      if (!apiKey) {
-        showStatus('api-status', 'Please enter an API key', 'error');
-        return;
-      }
-
-      api = new BriaFIBOAPI(apiKey);
-      showStatus('api-status', '✅ Connected to Bria FIBO Engine', 'success');
-
-      setTimeout(() => {
-        document.getElementById('object-section').style.display = 'block';
-        document.getElementById('object-section').scrollIntoView({ behavior: 'smooth' });
-      }, 500);
-    }
-
-    // Switch input mode
+    // Switch input mode (keeps original behavior)
     function switchInputMode(mode) {
       currentInputMode = mode;
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      event.target.classList.add('active');
+      // event might not be present (call from code), find clicked tab
+      const tabs = Array.from(document.querySelectorAll('.tab'));
+      const activeTab = mode === 'text' ? tabs[0] : tabs[1];
+      if (activeTab) activeTab.classList.add('active');
 
       document.getElementById('text-input-mode').style.display = mode === 'text' ? 'block' : 'none';
       document.getElementById('image-input-mode').style.display = mode === 'image' ? 'block' : 'none';
     }
 
-    // Generate base structured prompt - FIXED VERSION
+    // Generate base structured prompt - keeps existing behavior
     async function generateBasePrompt() {
       if (!api) {
         alert('Please initialize API first');
@@ -739,69 +668,39 @@
       try {
         let prompt, images = null;
 
-        // Check current mode
         if (currentInputMode === 'image') {
-          // IMAGE MODE - CRITICAL FIX
           if (!referenceImageBase64) {
             alert('Please upload a reference image first');
             statusEl.innerHTML = '<div class="error">❌ No reference image uploaded</div>';
             return;
           }
 
-          // Get context description (character bible)
           const context = document.getElementById('image-context').value.trim();
-
-          // Build comprehensive prompt
-          if (context) {
-            prompt = `Create variations of this subject maintaining exact visual characteristics. ${context}`;
-          } else {
-            prompt = 'Create variations of this subject, maintaining all visual characteristics, proportions, colors, textures, and identity across different camera angles and lighting conditions.';
-          }
-
-          // CRITICAL: Pass the image array
+          prompt = context ? `Create variations of this subject maintaining exact visual characteristics. ${context}` :
+            'Create variations of this subject, maintaining all visual characteristics, proportions, colors, textures, and identity across different camera angles and lighting conditions.';
           images = [referenceImageBase64];
-
-          console.log('Image mode - Sending:', {
-            promptLength: prompt.length,
-            imageDataLength: referenceImageBase64.length,
-            imagesArray: images.length
-          });
-
         } else {
-          // TEXT MODE
           prompt = document.getElementById('object-description').value.trim();
-
           if (!prompt) {
             alert('Please enter an object description');
             statusEl.innerHTML = '';
             return;
           }
-
-          console.log('Text mode - Sending:', { prompt });
         }
 
-        // Generate structured prompt with proper parameters
         const result = await api.generateStructuredPrompt(prompt, images, (attempt, max) => {
           statusEl.innerHTML = `<div class="loading">Processing with ${currentInputMode === 'image' ? 'reference image' : 'text description'}... (${attempt}/${max})</div>`;
         });
 
         baseStructuredPrompt = result.structured_prompt;
-
-        // Show success with mode-specific message
-        if (currentInputMode === 'image') {
-          statusEl.innerHTML = '<div class="success">✅ Base structure generated from reference image!</div>';
-        } else {
-          statusEl.innerHTML = '<div class="success">✅ Base structure generated from description!</div>';
-        }
-
+        statusEl.innerHTML = `<div class="success">✅ Base structure generated from ${currentInputMode === 'image' ? 'reference image' : 'description'}!</div>`;
         console.log('Structured prompt generated:', result);
 
-        // Show parameters section
         setTimeout(() => {
           document.getElementById('parameters-section').style.display = 'block';
           document.getElementById('parameters-section').scrollIntoView({ behavior: 'smooth' });
-          updateVariationCount();
-        }, 500);
+          updateAngleSweepCount();
+        }, 250);
 
       } catch (error) {
         console.error('Generation error:', error);
@@ -809,273 +708,273 @@
       }
     }
 
-    // Update variation count
-    function updateVariationCount() {
-      const cameras = document.querySelectorAll('#camera-angles input:checked').length;
-      const lights = document.querySelectorAll('#lighting-directions input:checked').length;
-      const total = cameras * lights;
-
-      document.getElementById('total-variations').textContent = total;
-      document.getElementById('estimated-time').textContent = Math.ceil(total * 0.5); // ~30s per image
-    }
-
-    // Add event listeners to checkboxes
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('#camera-angles input, #lighting-directions input').forEach(cb => {
-        cb.addEventListener('change', updateVariationCount);
-      });
-    });
-
-    // Apply preset
-    function applyPreset() {
-      const preset = document.getElementById('preset-select').value;
-      if (!preset) return;
-
-      // Reset all
-      document.querySelectorAll('#camera-angles input').forEach(cb => cb.checked = false);
-      document.querySelectorAll('#lighting-directions input').forEach(cb => cb.checked = false);
-
-      if (preset === 'product_photography') {
-        ['eye-level', 'high-angle', 'overhead'].forEach(v => {
-          document.querySelector(`#camera-angles input[value="${v}"]`).checked = true;
-        });
-        document.querySelector('#lighting-directions input[value="front-lit"]').checked = true;
-      } else if (preset === 'lighting_study') {
-        document.querySelector('#camera-angles input[value="eye-level"]').checked = true;
-        document.querySelectorAll('#lighting-directions input').forEach(cb => cb.checked = true);
-      } else if (preset === 'multi_angle') {
-        document.querySelectorAll('#camera-angles input').forEach(cb => cb.checked = true);
-        document.querySelector('#lighting-directions input[value="front-lit"]').checked = true;
-      }
-
-      updateVariationCount();
-    }
-
-    // Helper function
-    function showStatus(elementId, message, type) {
-      const el = document.getElementById(elementId);
-      el.className = `status-message ${type}`;
-      el.textContent = message;
-    }
-
-    // Start over
-    function startOver() {
-      location.reload();
-    }
-    let selectedDatasetSize = 'quick';
-
-    function setDatasetSize(size, event) {
-      selectedDatasetSize = size;
-
-      // Update button states
-      document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.closest('.size-btn').classList.add('active');
-
-      // Update recommendation
-      const recommendations = {
-        'quick': 'Quick Test perfect for validation and demos',
-        'standard': 'Standard size good for initial model training',
-        'medium': 'Medium dataset suitable for small-scale ML projects',
-        'large': 'Large dataset recommended for production ML models'
-      };
-
-      document.getElementById('size-recommendation').textContent = recommendations[size];
-
-      // Auto-select appropriate parameters
-      autoConfigureForSize(size);
-    }
-
-    function autoConfigureForSize(size) {
-      // Reset all selections
-      document.querySelectorAll('#camera-angles input').forEach(cb => cb.checked = false);
-      document.querySelectorAll('#lighting-directions input').forEach(cb => cb.checked = false);
-
-      if (size === 'quick') {
-        // 2 cameras × 2 lights = 4 variations
-        ['eye-level', 'high-angle'].forEach(angle => {
-          document.querySelector(`#camera-angles input[value="${angle}"]`).checked = true;
-        });
-        ['front-lit', 'side-lit'].forEach(light => {
-          document.querySelector(`#lighting-directions input[value="${light}"]`).checked = true;
-        });
-      } else if (size === 'standard') {
-        // 4 cameras × 4 lights = 16 variations
-        document.querySelectorAll('#camera-angles input').forEach(cb => cb.checked = true);
-        document.querySelectorAll('#lighting-directions input').forEach(cb => cb.checked = true);
-      } else if (size === 'medium') {
-        // 4 cameras × 4 lights × 2 backgrounds = 32 variations
-        document.querySelectorAll('#camera-angles input').forEach(cb => cb.checked = true);
-        document.querySelectorAll('#lighting-directions input').forEach(cb => cb.checked = true);
-        // User can toggle advanced params for more variations
-      } else if (size === 'large') {
-        // Maximum combinations
-        document.querySelectorAll('#camera-angles input').forEach(cb => cb.checked = true);
-        document.querySelectorAll('#lighting-directions input').forEach(cb => cb.checked = true);
-        // Suggest enabling advanced parameters
-        alert('💡 For 64-96 images, consider enabling Advanced Parameters and using multiple backgrounds/focal lengths');
-      }
-
-      updateVariationCount();
-    }
-
-    // Initialize on load
-    document.addEventListener('DOMContentLoaded', () => {
-      setDatasetSize('quick', { target: document.querySelector('.size-btn') });
-    });
-
-    // Slider update functions
-    function updateRotationValue(value) {
-      document.getElementById('rotation-value').textContent = value + '°';
-      updateCameraPreview();
-      updateAngleSweepCount();
-    }
-
-    function updateTiltValue(value) {
-      document.getElementById('tilt-value').textContent = value + '°';
-      updateCameraPreview();
-      updateAngleSweepCount();
-    }
-
-    function updateZoomValue(value) {
-      const labels = { 0: 'Close', 5: 'Mid', 10: 'Far' };
-      document.getElementById('zoom-value').textContent = labels[value] || value;
-      updateCameraPreview();
-      updateAngleSweepCount();
-    }
-
-    // Update 3D preview
+    // Update camera preview (unchanged)
     function updateCameraPreview() {
       const rotation = parseInt(document.getElementById('rotation-slider').value);
       const tilt = parseInt(document.getElementById('tilt-slider').value);
       const zoom = parseInt(document.getElementById('zoom-slider').value);
 
-      // Update object rotation
       const object = document.getElementById('preview-object');
-      object.style.transform = `rotateY(${rotation}deg) rotateX(${-tilt}deg)`;
+      if (object) object.style.transform = `rotateY(${rotation}deg) rotateX(${-tilt}deg)`;
 
-      // Update camera position indicator
       const camera = document.getElementById('camera-indicator');
-      const radius = 60 + (zoom * 5); // Adjust based on zoom
-      const angleRad = (rotation * Math.PI) / 180;
-      const tiltRad = (tilt * Math.PI) / 180;
+      if (camera) {
+        const radius = 60 + (zoom * 5);
+        const angleRad = (rotation * Math.PI) / 180;
+        const tiltRad = (tilt * Math.PI) / 180;
+        const x = 50 + Math.sin(angleRad) * radius;
+        const y = 50 + Math.sin(tiltRad) * 30;
+        camera.style.left = x + '%';
+        camera.style.top = y + '%';
+      }
 
-      const x = 50 + Math.sin(angleRad) * radius;
-      const y = 50 + Math.sin(tiltRad) * 30;
-
-      camera.style.left = x + '%';
-      camera.style.top = y + '%';
-
-      // Update label
       const rotationLabel = rotation < -30 ? 'Left' : rotation > 30 ? 'Right' : 'Front';
       const tiltLabel = tilt < -15 ? 'High' : tilt > 15 ? 'Low' : 'Eye-Level';
       const zoomLabel = zoom === 0 ? 'Close' : zoom === 5 ? 'Mid-Distance' : 'Far';
-
-      document.getElementById('preview-position').textContent = `${rotationLabel}, ${tiltLabel}, ${zoomLabel}`;
+      const previewLabelEl = document.getElementById('preview-position');
+      if (previewLabelEl) previewLabelEl.textContent = `${rotationLabel}, ${tiltLabel}, ${zoomLabel}`;
     }
 
-    // Update angle sweep count
+    // Angle sweep & count logic (keeps same behavior but robust to missing nodes)
     function updateAngleSweepCount() {
       const rotationSweep = document.getElementById('enable-rotation-sweep')?.checked;
       const tiltSweep = document.getElementById('enable-tilt-sweep')?.checked;
       const zoomSweep = document.getElementById('enable-zoom-sweep')?.checked;
 
       let count = 1;
-      let detail = [];
+      const detail = [];
 
-      // Calculate camera variations
-      if (rotationSweep) {
-        count *= 5; // 5 rotation angles (-90, -45, 0, 45, 90)
-        detail.push('Rotation: 5');
-      } else {
-        detail.push('Rotation: 1');
-      }
+      if (rotationSweep) { count *= 5; detail.push('Rotation: 5'); } else { detail.push('Rotation: 1'); }
+      if (tiltSweep) { count *= 3; detail.push('Tilt: 3'); } else { detail.push('Tilt: 1'); }
+      if (zoomSweep) { count *= 3; detail.push('Zoom: 3'); } else { detail.push('Zoom: 1'); }
 
-      if (tiltSweep) {
-        count *= 3; // 3 tilt angles (-45, 0, 45)
-        detail.push('Tilt: 3');
-      } else {
-        detail.push('Tilt: 1');
-      }
-
-      if (zoomSweep) {
-        count *= 3; // 3 zoom levels (0, 5, 10)
-        detail.push('Zoom: 3');
-      } else {
-        detail.push('Zoom: 1');
-      }
-
-      // Calculate lighting variations - FIXED: Use checkboxes
       const selectedLighting = document.querySelectorAll('.lighting-presets input[type="checkbox"]:checked').length || 1;
       count *= selectedLighting;
       detail.push(`Lighting: ${selectedLighting}`);
 
-      // Update displays
-      document.getElementById('angle-sweep-count').textContent = count;
-      document.getElementById('angle-sweep-detail').textContent = detail.join(' × ') + ` = ${count} variations`;
+      const angleCountEl = document.getElementById('angle-sweep-count');
+      const angleDetailEl = document.getElementById('angle-sweep-detail');
+      if (angleCountEl) angleCountEl.textContent = count;
+      if (angleDetailEl) angleDetailEl.textContent = detail.join(' × ') + ` = ${count} variations`;
 
-      // CRITICAL FIX: Update the generation-summary section
       const totalVariationsEl = document.getElementById('total-variations');
       const estimatedTimeEl = document.getElementById('estimated-time');
-
-      if (totalVariationsEl) {
-        totalVariationsEl.textContent = count;
-      }
-
+      if (totalVariationsEl) totalVariationsEl.textContent = count;
       if (estimatedTimeEl) {
-        // Estimate: ~15 seconds per image (including API rate limiting)
-        const estimatedMinutes = Math.ceil((count * 15) / 60);
+        const estimatedMinutes = Math.ceil((count * 15) / 60); // 15s per image
         estimatedTimeEl.textContent = estimatedMinutes;
       }
 
-      // Update lighting count
       updateLightingCount();
     }
 
-    // Initialize on load
-    document.addEventListener('DOMContentLoaded', () => {
-      updateCameraPreview();
+    function updateLightingCount() {
+      const checkedLighting = document.querySelectorAll('.lighting-presets input[type="checkbox"]:checked').length;
+      const lightingCountEl = document.getElementById('lighting-count');
+      if (lightingCountEl) {
+        lightingCountEl.textContent = checkedLighting || 0;
+      }
+    }
+
+    // dataset-size behavior: selecting a dataset size forces presets (but manual changes afterwards override)
+    function setDatasetSize(size, event) {
+      selectedDatasetSize = size;
+
+      // Update button active states
+      document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
+      // try to find the closest .size-btn from event.target, fallback to matching data-size button
+      try {
+        if (event && event.target && event.target.closest) {
+          const clicked = event.target.closest('.size-btn');
+          if (clicked) clicked.classList.add('active');
+          else {
+            const fallback = document.querySelector(`.size-btn[data-size="${size}"]`);
+            if (fallback) fallback.classList.add('active');
+          }
+        } else {
+          const fallback = document.querySelector(`.size-btn[data-size="${size}"]`);
+          if (fallback) fallback.classList.add('active');
+        }
+      } catch (e) {
+        const fallback = document.querySelector(`.size-btn[data-size="${size}"]`);
+        if (fallback) fallback.classList.add('active');
+      }
+
+      const recommendations = {
+        'quick': 'Quick Test perfect for validation and demos',
+        'standard': 'Standard size good for initial model training',
+        'medium': 'Medium dataset suitable for small-scale ML projects',
+        'large': 'Large dataset recommended for production ML models (90 images)'
+      };
+      document.getElementById('size-recommendation').textContent = recommendations[size] || '';
+
+      // Apply preset behaviour per size:
+      if (size === 'quick') {
+        // Rotation sweep on (5), tilt off, zoom off, keep 1 lighting
+        document.getElementById('enable-rotation-sweep').checked = true;
+        document.getElementById('enable-tilt-sweep').checked = false;
+        document.getElementById('enable-zoom-sweep').checked = false;
+
+        // set sliders to defaults but allow user to change them later
+        document.getElementById('rotation-slider').value = 0;
+        document.getElementById('tilt-slider').value = 0;
+        document.getElementById('zoom-slider').value = 5;
+
+        // enforce only front-lit by default
+        document.querySelectorAll('#lighting-directions input[type="checkbox"]').forEach(cb => cb.checked = false);
+        const front = document.querySelector('#lighting-directions input[value="front-lit"]');
+        if (front) front.checked = true;
+
+      } else if (size === 'standard') {
+        // rotation & tilt on, zoom off, 1 lighting
+        document.getElementById('enable-rotation-sweep').checked = true;
+        document.getElementById('enable-tilt-sweep').checked = true;
+        document.getElementById('enable-zoom-sweep').checked = false;
+
+        document.querySelectorAll('#lighting-directions input[type="checkbox"]').forEach(cb => cb.checked = true);
+
+      } else if (size === 'medium') {
+        // rotation & tilt on, zoom off, multiple lightings
+        document.getElementById('enable-rotation-sweep').checked = true;
+        document.getElementById('enable-tilt-sweep').checked = true;
+        document.getElementById('enable-zoom-sweep').checked = false;
+
+        // try to select 3 lighting (if available) - pick all
+        document.querySelectorAll('#lighting-directions input[type="checkbox"]').forEach(cb => cb.checked = true);
+
+      } else if (size === 'large') {
+        // LARGE -> target 90 images: rotation(5) x tilt(3) x zoom(3) x lighting(2) = 90
+        document.getElementById('enable-rotation-sweep').checked = true;
+        document.getElementById('enable-tilt-sweep').checked = true;
+        document.getElementById('enable-zoom-sweep').checked = true;
+
+        // prefer two lighting options: front-lit + side-lit (fallback to whatever exists)
+        document.querySelectorAll('#lighting-directions input[type="checkbox"]').forEach(cb => cb.checked = false);
+        const prefer = ['front-lit', 'side-lit'];
+        prefer.forEach(v => {
+          const el = document.querySelector(`#lighting-directions input[value="${v}"]`);
+          if (el) el.checked = true;
+        });
+
+        // if prefer didn't find at least 2, check any first two available
+        const checkedNow = document.querySelectorAll('#lighting-directions input[type="checkbox"]:checked').length;
+        if (checkedNow < 2) {
+          const allLights = Array.from(document.querySelectorAll('#lighting-directions input[type="checkbox"]'));
+          for (let i = 0; i < allLights.length && i < 2; i++) {
+            allLights[i].checked = true;
+          }
+        }
+
+        // set sliders to extremes to reflect sweep (sliders are still usable)
+        document.getElementById('rotation-slider').value = 0;
+        document.getElementById('tilt-slider').value = 0;
+        document.getElementById('zoom-slider').value = 5;
+      }
+
+      // After forcing settings, refresh counts
       updateAngleSweepCount();
+    }
 
-      // Add listeners to sweep checkboxes
-      ['enable-rotation-sweep', 'enable-tilt-sweep', 'enable-zoom-sweep'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.addEventListener('change', updateAngleSweepCount);
-        }
-      });
+    // Apply preset (uses camera-angles hidden block to remain compatible)
+    function applyPreset() {
+      const preset = document.getElementById('preset-select').value;
+      if (!preset) return;
 
-      // Add listeners to sliders (for manual mode)
-      ['rotation-slider', 'tilt-slider', 'zoom-slider'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.addEventListener('input', updateAngleSweepCount);
-        }
-      });
+      // Reset all camera & lighting inputs (compat wrappers)
+      document.querySelectorAll('#camera-angles input').forEach(cb => cb.checked = false);
+      document.querySelectorAll('#lighting-directions input').forEach(cb => cb.checked = false);
 
-      // Add listeners to lighting checkboxes
-      document.querySelectorAll('.lighting-presets input[type="checkbox"]').forEach(checkbox => {
-        checkbox.addEventListener('change', updateAngleSweepCount);
-      });
-
-      function updateLightingCount() {
-        const checkedLighting = document.querySelectorAll('.lighting-presets input[type="checkbox"]:checked').length;
-        document.getElementById('lighting-count').textContent = checkedLighting || 0;
+      if (preset === 'product_photography') {
+        ['eye-level', 'high-angle', 'overhead'].forEach(v => {
+          const el = document.querySelector(`#camera-angles input[value="${v}"]`);
+          if (el) el.checked = true;
+        });
+        const front = document.querySelector('#lighting-directions input[value="front-lit"]');
+        if (front) front.checked = true;
+      } else if (preset === 'lighting_study') {
+        const el = document.querySelector('#camera-angles input[value="eye-level"]');
+        if (el) el.checked = true;
+        document.querySelectorAll('#lighting-directions input').forEach(cb => cb.checked = true);
+      } else if (preset === 'multi_angle') {
+        document.querySelectorAll('#camera-angles input').forEach(cb => cb.checked = true);
+        const front = document.querySelector('#lighting-directions input[value="front-lit"]');
+        if (front) front.checked = true;
       }
 
-      // Initialize lighting count
-      document.addEventListener('DOMContentLoaded', () => {
-        updateLightingCount();
-      });
+      updateAngleSweepCount();
+    }
 
-      // Update lighting count display
-      function updateLightingCount() {
-        const checkedLighting = document.querySelectorAll('.lighting-presets input[type="checkbox"]:checked').length;
-        const lightingCountEl = document.getElementById('lighting-count');
-        if (lightingCountEl) {
-          lightingCountEl.textContent = checkedLighting || 0;
-        }
+    // Helper: start over
+    function startOver() {
+      location.reload();
+    }
+
+    // tiny utility: sanitize filename
+    function sanitizeFilename(name) {
+      return name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    }
+
+    // Modal helpers (metadata)
+    function viewMetadata() {
+      const modal = document.getElementById('metadata-modal');
+      const viewer = document.getElementById('metadata-viewer');
+
+      const manifestData = {
+        generated_at: new Date().toISOString(),
+        total_variations: datasetResults.length,
+        base_description: document.getElementById('object-description')?.value || '',
+        variations: datasetResults.map(r => ({
+          name: r.variation_name,
+          seed: r.seed,
+          modifications: r.modifications,
+          image_url: r.image_url
+        }))
+      };
+
+      viewer.textContent = JSON.stringify(manifestData, null, 2);
+      modal.style.display = 'flex';
+    }
+
+    function closeMetadataModal() {
+      document.getElementById('metadata-modal').style.display = 'none';
+    }
+
+    // Expose a couple functions globally that generator.js may call directly
+    window.getCameraAngleFromRTZ = function (rotation, tilt) {
+      // consistent with the generator helper used previously
+      if (tilt <= -45) return 'overhead';
+      if (tilt <= -30) return 'high-angle';
+      if (tilt >= 30) return 'low-angle';
+      if (rotation === 0 && tilt === 0) return 'eye-level';
+      return 'eye-level';
+    };
+
+    window.getDistanceFromZoom = function (zoom) {
+      if (zoom === 0) return 'close';
+      if (zoom === 5) return 'mid';
+      if (zoom === 10) return 'far';
+      return 'mid';
+    };
+    // ------------------------------------------------------------
+    // FIXED: Advanced Parameters Accordion Toggle (GLOBAL FUNCTION)
+    // ------------------------------------------------------------
+    window.toggleAdvancedParams = function () {
+      const content = document.getElementById('advanced-params-content');
+      const button = document.querySelector('.accordion-toggle');
+
+      if (!content || !button) return;
+
+      const isOpen = content.style.display === 'grid';
+
+      if (isOpen) {
+        content.style.display = 'none';
+        button.classList.remove('active');
+      } else {
+        content.style.display = 'grid';
+        button.classList.add('active');
       }
-    });
+    };
+
   </script>
 </body>
 
