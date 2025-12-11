@@ -36,7 +36,7 @@ async function createDatasetZIP(results) {
     }
 
     const zip = new JSZip();
-    
+
     // Create folder structure
     const imagesFolder = zip.folder('dataset/images');
     const metadataFolder = zip.folder('dataset/metadata');
@@ -58,7 +58,7 @@ async function createDatasetZIP(results) {
             // Fetch image
             const imageResponse = await fetch(result.image_url);
             const imageBlob = await imageResponse.blob();
-            
+
             // Add image to ZIP
             imagesFolder.file(`${filename}.png`, imageBlob);
 
@@ -108,7 +108,7 @@ function loadJSZip() {
 // Create manifest.json
 function createManifest(results) {
     const objectDescription = document.getElementById('object-description').value;
-    
+
     return {
         dataset_info: {
             name: 'FIBO DataForge Dataset',
@@ -119,8 +119,19 @@ function createManifest(results) {
         object_description: objectDescription,
         total_variations: results.length,
         parameters: {
-            camera_angles: getSelectedValues('#camera-angles'),
-            lighting_directions: getSelectedValues('#lighting-directions'),
+            camera: {
+                rotation_sweep: document.getElementById('enable-rotation-sweep')?.checked || false,
+                tilt_sweep: document.getElementById('enable-tilt-sweep')?.checked || false,
+                zoom_sweep: document.getElementById('enable-zoom-sweep')?.checked || false,
+
+                rotation_value: parseInt(document.getElementById('rotation-slider')?.value || 0),
+                tilt_value: parseInt(document.getElementById('tilt-slider')?.value || 0),
+                zoom_value: parseInt(document.getElementById('zoom-slider')?.value || 5)
+            },
+            lighting_directions: Array.from(
+                document.querySelectorAll('.lighting-presets input[type="checkbox"]:checked')
+            ).map(cb => cb.value),
+
             background: document.querySelector('input[name="background"]:checked')?.value,
             focal_length: document.querySelector('input[name="focal-length"]:checked')?.value
         },
@@ -168,8 +179,20 @@ dataset/
 
 This dataset includes variations across:
 
-- **Camera Angles:** ${getSelectedValues('#camera-angles').join(', ')}
-- **Lighting Directions:** ${getSelectedValues('#lighting-directions').join(', ')}
+### Camera Parameters
+
+- **Rotation Sweep:** ${document.getElementById('enable-rotation-sweep').checked}
+- **Tilt Sweep:** ${document.getElementById('enable-tilt-sweep').checked}
+- **Zoom Sweep:** ${document.getElementById('enable-zoom-sweep').checked}
+
+- **Rotation Value:** ${document.getElementById('rotation-slider').value}°
+- **Tilt Value:** ${document.getElementById('tilt-slider').value}°
+- **Zoom Value:** ${document.getElementById('zoom-slider').value}
+
+### Lighting
+- ${Array.from(document.querySelectorAll('.lighting-presets input[type="checkbox"]:checked'))
+            .map(cb => cb.value).join(', ')}
+
 - **Background:** ${document.querySelector('input[name="background"]:checked')?.value}
 - **Focal Length:** ${document.querySelector('input[name="focal-length"]:checked')?.value}
 
