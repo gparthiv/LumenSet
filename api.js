@@ -139,6 +139,51 @@ class BriaFIBOAPI {
   modifyStructuredPrompt(structuredPrompt, modifications) {
     const modified = JSON.parse(JSON.stringify(structuredPrompt));
 
+    if (modifications.rotation_degrees !== undefined) {
+      // Rotation affects the description
+      let rotationDesc = '';
+      if (modifications.rotation_degrees < -30) {
+        rotationDesc = 'viewed from the left side';
+      } else if (modifications.rotation_degrees > 30) {
+        rotationDesc = 'viewed from the right side';
+      } else {
+        rotationDesc = 'viewed from the front';
+      }
+
+      // Add to short description if it exists
+      if (modified.short_description) {
+        modified.short_description = modified.short_description.replace(
+          /\.$/,
+          `, ${rotationDesc}.`
+        );
+      }
+
+      // Also update camera angle based on rotation + tilt
+      if (modifications.tilt_degrees !== undefined) {
+        const tilt = modifications.tilt_degrees;
+        const rotation = modifications.rotation_degrees;
+
+        let angleDesc = '';
+        if (tilt < -30) {
+          angleDesc = 'high-angle view looking down';
+        } else if (tilt > 30) {
+          angleDesc = 'low-angle view looking up';
+        } else {
+          angleDesc = 'eye-level view';
+        }
+
+        if (rotation < -30) {
+          angleDesc += ' from the left side';
+        } else if (rotation > 30) {
+          angleDesc += ' from the right side';
+        } else {
+          angleDesc += ' from the front';
+        }
+
+        modified.photographic_characteristics.camera_angle = angleDesc;
+      }
+    }
+
     // Ensure required objects exist
     if (!modified.photographic_characteristics) modified.photographic_characteristics = {};
     if (!modified.lighting) modified.lighting = {};
