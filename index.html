@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FIBO DataForge - Synthetic Dataset Generator</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style2.css">
 </head>
 
 <body>
@@ -14,24 +14,38 @@
     <div class="container">
       <h1 class="logo">📦 FIBO DataForge</h1>
       <p class="tagline">Structured Synthetic Dataset Generator</p>
+      <p class="sub-tagline">Powered by Bria FIBO AI - Generate ML-ready datasets in minutes</p>
     </div>
   </header>
 
+  <!-- Value Propositions -->
+  <div class="container">
+    <div class="value-props">
+      <div class="prop">
+        <span class="prop-icon">⚡</span>
+        <strong>Lightning Fast</strong>
+        <small>10-15 sec per image</small>
+      </div>
+      <div class="prop">
+        <span class="prop-icon">🎯</span>
+        <strong>100% Reproducible</strong>
+        <small>Seed + JSON = Identical output</small>
+      </div>
+      <div class="prop">
+        <span class="prop-icon">📊</span>
+        <strong>Full Metadata</strong>
+        <small>Complete documentation</small>
+      </div>
+      <div class="prop">
+        <span class="prop-icon">🤖</span>
+        <strong>ML-Ready</strong>
+        <small>Perfect for training</small>
+      </div>
+    </div>
+  </div>
+
   <!-- Main Content -->
   <main class="container">
-    <!-- Step 1: API Setup -->
-    <section class="card" id="setup-section">
-      <h2>⚙️ Setup</h2>
-      <div class="form-group">
-        <label for="api-key">Bria API Key:</label>
-        <input type="password" id="api-key" placeholder="Paste your API key">
-        <small>Get your key from <a href="https://platform.bria.ai/console/account/api-keys" target="_blank">Bria
-            Platform</a></small>
-      </div>
-      <button class="btn btn-primary" onclick="initializeAPI()">Initialize API</button>
-      <div id="api-status" class="status-message"></div>
-    </section>
-
     <!-- Step 2: Object Description -->
     <section class="card" id="object-section" style="display: none;">
       <h2>📝 Step 1: Describe Your Object</h2>
@@ -44,8 +58,9 @@
       <div id="text-input-mode" class="input-mode">
         <div class="form-group">
           <label for="object-description">Object Description:</label>
-          <input type="text" id="object-description" placeholder="e.g., a red ceramic coffee mug"
-            value="a red ceramic coffee mug">
+          <input type="text" id="object-description"
+            placeholder="e.g., industrial bolt with threading, agricultural tomato, robotic gripper component" value="">
+          <small>💡 Tip: Be specific for better results (materials, colors, textures)</small>
         </div>
       </div>
 
@@ -54,19 +69,14 @@
           <label>Upload Reference Image:</label>
           <input type="file" id="reference-image" accept="image/*" onchange="previewReferenceImage(event)">>
           <div id="image-preview" class="image-preview-container"></div>
-          <small>For character/object consistency across all variations</small>
+          <small>✨ For maximum consistency: Upload clear, well-lit reference photo</small>
         </div>
         <div class="form-group">
           <label for="image-context">Detailed Description (Character Bible):</label>
           <textarea id="image-context" rows="4"
-            placeholder="Describe specific details: bone structure, facial features, skin tone, proportions, textures, materials, colors, unique characteristics..."></textarea>
-          <small>💡 Tip: More detail = better consistency</small>
-        </div>
-        <div class="form-group">
-          <label>
-            <input type="checkbox" id="lock-character" checked>
-            Lock character/object identity across all variations
-          </label>
+            placeholder="Describe key features: dimensions, materials, textures, colors, unique characteristics. More detail = better consistency across angles."></textarea>
+          <small>💡 Example: "Red tomato, 7cm diameter, smooth skin with slight green stem, minor natural
+            blemishes"</small>
         </div>
       </div>
 
@@ -124,46 +134,169 @@
 
       <div class="parameters-grid">
         <!-- Camera Parameters -->
-        <div class="param-group">
-          <h3>📷 Camera</h3>
-          <div class="checkbox-group" id="camera-angles">
-            <label><input type="checkbox" value="eye-level" checked> Eye Level</label>
-            <label><input type="checkbox" value="high-angle"> High Angle</label>
-            <label><input type="checkbox" value="low-angle"> Low Angle</label>
-            <label><input type="checkbox" value="overhead"> Overhead</label>
+        <div class="camera-control-panel">
+          <h3 style="font-size: 50px;">📷 Camera Controls</h3>
+
+          <!-- Rotation Control -->
+          <div class="camera-slider-group">
+            <label>
+              <span class="slider-label">🔄 Rotation (Left ← → Right)</span>
+              <span class="slider-value" id="rotation-value">0°</span>
+            </label>
+            <input type="range" id="rotation-slider" min="-90" max="90" value="0" step="45"
+              oninput="updateRotationValue(this.value)">
+            <div class="slider-markers">
+              <span>-90°</span>
+              <span>-45°</span>
+              <span>0°</span>
+              <span>45°</span>
+              <span>90°</span>
+            </div>
+            <small>Controls horizontal rotation around object</small>
+          </div>
+
+          <!-- Tilt Control -->
+          <div class="camera-slider-group">
+            <label>
+              <span class="slider-label">📐 Tilt (Up ↑ ↓ Down)</span>
+              <span class="slider-value" id="tilt-value">0°</span>
+            </label>
+            <input type="range" id="tilt-slider" min="-45" max="45" value="0" step="45"
+              oninput="updateTiltValue(this.value)">
+            <div class="slider-markers">
+              <span>-45° (Up)</span>
+              <span>0° (Level)</span>
+              <span>45° (Down)</span>
+            </div>
+            <small>Controls vertical camera angle</small>
+          </div>
+
+          <!-- Zoom Control -->
+          <div class="camera-slider-group">
+            <label>
+              <span class="slider-label">🔍 Zoom (Distance)</span>
+              <span class="slider-value" id="zoom-value">5</span>
+            </label>
+            <input type="range" id="zoom-slider" min="0" max="10" value="5" step="5"
+              oninput="updateZoomValue(this.value)">
+            <div class="slider-markers">
+              <span>0 (Close)</span>
+              <span>5 (Mid)</span>
+              <span>10 (Far)</span>
+            </div>
+            <small>Controls camera distance from subject</small>
+          </div>
+
+          <!-- Multi-Angle Sweep Generator -->
+          <div class="angle-sweep-section">
+            <h4>🔄 Generate Multi-Angle Sweep</h4>
+            <p class="sweep-description">Automatically generate images across all rotation/tilt combinations</p>
+
+            <div class="sweep-options">
+              <label>
+                <input type="checkbox" id="enable-rotation-sweep" checked>
+                <strong>Rotation Sweep</strong> (5 angles: -90° to 90°)
+              </label>
+              <label>
+                <input type="checkbox" id="enable-tilt-sweep">
+                <strong>Tilt Sweep</strong> (3 angles: -45°, 0°, 45°)
+              </label>
+              <label>
+                <input type="checkbox" id="enable-zoom-sweep">
+                <strong>Zoom Sweep</strong> (3 distances: close, mid, far)
+              </label>
+            </div>
+
+            <div class="sweep-summary">
+              <p>Total angles: <strong id="angle-sweep-count">5</strong> images</p>
+              <small id="angle-sweep-detail">Rotation: 5 angles × Lighting: 1 = 5 variations</small>
+            </div>
+          </div>
+
+          <!-- 3D Preview (Simple Visualization) -->
+          <div class="camera-preview-3d">
+            <h4>📸 Camera Position Preview</h4>
+            <div class="preview-container">
+              <div class="preview-object" id="preview-object">
+                <div class="object-cube"></div>
+              </div>
+              <div class="camera-indicator" id="camera-indicator">📷</div>
+            </div>
+            <p class="preview-label">
+              Position: <span id="preview-position">Front, Eye-Level, Mid-Distance</span>
+            </p>
           </div>
         </div>
 
-        <!-- Lighting Parameters -->
-        <div class="param-group">
-          <h3>💡 Lighting</h3>
-          <div class="checkbox-group" id="lighting-directions">
-            <label><input type="checkbox" value="front-lit" checked> Front Light</label>
-            <label><input type="checkbox" value="side-lit"> Side Light</label>
-            <label><input type="checkbox" value="back-lit"> Back Light</label>
-            <label><input type="checkbox" value="top-lit"> Top Light</label>
+        <!-- Lighting Controls (Simplified) -->
+        <div class="lighting-control-panel">
+          <h3>💡 Lighting Directions</h3>
+          <p class="control-description">Select one or multiple lighting directions for your dataset</p>
+
+          <div class="lighting-presets">
+            <label>
+              <input type="checkbox" name="lighting" value="front-lit" checked onchange="updateAngleSweepCount()">
+              <span class="preset-card">
+                <span class="preset-icon">☀️</span>
+                <strong>Front Light</strong>
+                <small>Even illumination</small>
+              </span>
+            </label>
+
+            <label>
+              <input type="checkbox" name="lighting" value="side-lit" onchange="updateAngleSweepCount()">
+              <span class="preset-card">
+                <span class="preset-icon">🌓</span>
+                <strong>Side Light</strong>
+                <small>Dramatic shadows</small>
+              </span>
+            </label>
+
+            <label>
+              <input type="checkbox" name="lighting" value="back-lit" onchange="updateAngleSweepCount()">
+              <span class="preset-card">
+                <span class="preset-icon">🌅</span>
+                <strong>Back Light</strong>
+                <small>Rim lighting</small>
+              </span>
+            </label>
+
+            <label>
+              <input type="checkbox" name="lighting" value="top-lit" onchange="updateAngleSweepCount()">
+              <span class="preset-card">
+                <span class="preset-icon">💡</span>
+                <strong>Top Light</strong>
+                <small>Overhead</small>
+              </span>
+            </label>
+          </div>
+
+          <div class="lighting-summary">
+            <p>Selected: <strong id="lighting-count">1</strong> lighting direction(s)</p>
           </div>
         </div>
 
         <!-- Background Parameters -->
-        <div class="param-group">
-          <h3>🎨 Background</h3>
-          <div class="radio-group" id="backgrounds">
-            <label><input type="radio" name="background" value="white-studio" checked> White Studio</label>
-            <label><input type="radio" name="background" value="black-studio"> Black Studio</label>
-            <label><input type="radio" name="background" value="wooden-surface"> Wooden Surface</label>
-            <label><input type="radio" name="background" value="fabric-texture"> Fabric</label>
+        <div class="parameters-row">
+          <div class="param-group">
+            <h3>🎨 Background</h3>
+            <div class="radio-group" id="backgrounds">
+              <label><input type="radio" name="background" value="white-studio" checked> White Studio</label>
+              <label><input type="radio" name="background" value="black-studio"> Black Studio</label>
+              <label><input type="radio" name="background" value="wooden-surface"> Wooden Surface</label>
+              <label><input type="radio" name="background" value="fabric-texture"> Fabric</label>
+            </div>
           </div>
-        </div>
 
-        <!-- Focal Length -->
-        <div class="param-group">
-          <h3>🔍 Focal Length</h3>
-          <div class="radio-group" id="focal-lengths">
-            <label><input type="radio" name="focal-length" value="wide-angle"> Wide (24mm)</label>
-            <label><input type="radio" name="focal-length" value="standard" checked> Standard (50mm)</label>
-            <label><input type="radio" name="focal-length" value="portrait"> Portrait (85mm)</label>
-            <label><input type="radio" name="focal-length" value="telephoto"> Telephoto (135mm)</label>
+          <!-- Focal Length -->
+          <div class="param-group">
+            <h3>🔍 Focal Length</h3>
+            <div class="radio-group" id="focal-lengths">
+              <label><input type="radio" name="focal-length" value="wide-angle"> Wide (24mm)</label>
+              <label><input type="radio" name="focal-length" value="standard" checked> Standard (50mm)</label>
+              <label><input type="radio" name="focal-length" value="portrait"> Portrait (85mm)</label>
+              <label><input type="radio" name="focal-length" value="telephoto"> Telephoto (135mm)</label>
+            </div>
           </div>
         </div>
       </div>
@@ -501,13 +634,15 @@
 
   <!-- Footer -->
   <footer class="footer">
-    <p>Powered by <strong>Bria FIBO</strong> | Built for Bria FIBO Hackathon 2025</p>
+    <p><strong>FIBO DataForge</strong> - Enterprise-Grade Dataset Generation</p>
+    <p><small>Powered by Bria FIBO AI | Built for ML Professionals | © 2025</small></p>
   </footer>
 
   <!-- Scripts -->
-  <script src="api.js"></script>
-  <script src="generator.js"></script>
+  <script src="api2.js"></script>
+  <script src="generator2.js"></script>
   <script src="exporter.js"></script>
+  <script src="config.js"></script>
   <script>
     // Global state
     let api = null;
@@ -550,6 +685,19 @@
       reader.readAsDataURL(file);
     }
 
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.CONFIG && window.CONFIG.BRIA_API_KEY !== 'YOUR_API_KEY_HERE') {
+        api = new BriaFIBOAPI(window.CONFIG.BRIA_API_KEY);
+        console.log('✅ API initialized automatically');
+
+        // Show object section immediately
+        document.getElementById('object-section').style.display = 'block';
+      } else {
+        alert('⚠️ API Key not configured. Please update config.js with your Bria API key.');
+      }
+
+      // Other initialization...
+    });
 
     // Initialize API
     function initializeAPI() {
@@ -773,6 +921,160 @@
     // Initialize on load
     document.addEventListener('DOMContentLoaded', () => {
       setDatasetSize('quick', { target: document.querySelector('.size-btn') });
+    });
+
+    // Slider update functions
+    function updateRotationValue(value) {
+      document.getElementById('rotation-value').textContent = value + '°';
+      updateCameraPreview();
+      updateAngleSweepCount();
+    }
+
+    function updateTiltValue(value) {
+      document.getElementById('tilt-value').textContent = value + '°';
+      updateCameraPreview();
+      updateAngleSweepCount();
+    }
+
+    function updateZoomValue(value) {
+      const labels = { 0: 'Close', 5: 'Mid', 10: 'Far' };
+      document.getElementById('zoom-value').textContent = labels[value] || value;
+      updateCameraPreview();
+      updateAngleSweepCount();
+    }
+
+    // Update 3D preview
+    function updateCameraPreview() {
+      const rotation = parseInt(document.getElementById('rotation-slider').value);
+      const tilt = parseInt(document.getElementById('tilt-slider').value);
+      const zoom = parseInt(document.getElementById('zoom-slider').value);
+
+      // Update object rotation
+      const object = document.getElementById('preview-object');
+      object.style.transform = `rotateY(${rotation}deg) rotateX(${-tilt}deg)`;
+
+      // Update camera position indicator
+      const camera = document.getElementById('camera-indicator');
+      const radius = 60 + (zoom * 5); // Adjust based on zoom
+      const angleRad = (rotation * Math.PI) / 180;
+      const tiltRad = (tilt * Math.PI) / 180;
+
+      const x = 50 + Math.sin(angleRad) * radius;
+      const y = 50 + Math.sin(tiltRad) * 30;
+
+      camera.style.left = x + '%';
+      camera.style.top = y + '%';
+
+      // Update label
+      const rotationLabel = rotation < -30 ? 'Left' : rotation > 30 ? 'Right' : 'Front';
+      const tiltLabel = tilt < -15 ? 'High' : tilt > 15 ? 'Low' : 'Eye-Level';
+      const zoomLabel = zoom === 0 ? 'Close' : zoom === 5 ? 'Mid-Distance' : 'Far';
+
+      document.getElementById('preview-position').textContent = `${rotationLabel}, ${tiltLabel}, ${zoomLabel}`;
+    }
+
+    // Update angle sweep count
+    function updateAngleSweepCount() {
+      const rotationSweep = document.getElementById('enable-rotation-sweep')?.checked;
+      const tiltSweep = document.getElementById('enable-tilt-sweep')?.checked;
+      const zoomSweep = document.getElementById('enable-zoom-sweep')?.checked;
+
+      let count = 1;
+      let detail = [];
+
+      // Calculate camera variations
+      if (rotationSweep) {
+        count *= 5; // 5 rotation angles (-90, -45, 0, 45, 90)
+        detail.push('Rotation: 5');
+      } else {
+        detail.push('Rotation: 1');
+      }
+
+      if (tiltSweep) {
+        count *= 3; // 3 tilt angles (-45, 0, 45)
+        detail.push('Tilt: 3');
+      } else {
+        detail.push('Tilt: 1');
+      }
+
+      if (zoomSweep) {
+        count *= 3; // 3 zoom levels (0, 5, 10)
+        detail.push('Zoom: 3');
+      } else {
+        detail.push('Zoom: 1');
+      }
+
+      // Calculate lighting variations - FIXED: Use checkboxes
+      const selectedLighting = document.querySelectorAll('.lighting-presets input[type="checkbox"]:checked').length || 1;
+      count *= selectedLighting;
+      detail.push(`Lighting: ${selectedLighting}`);
+
+      // Update displays
+      document.getElementById('angle-sweep-count').textContent = count;
+      document.getElementById('angle-sweep-detail').textContent = detail.join(' × ') + ` = ${count} variations`;
+
+      // CRITICAL FIX: Update the generation-summary section
+      const totalVariationsEl = document.getElementById('total-variations');
+      const estimatedTimeEl = document.getElementById('estimated-time');
+
+      if (totalVariationsEl) {
+        totalVariationsEl.textContent = count;
+      }
+
+      if (estimatedTimeEl) {
+        // Estimate: ~15 seconds per image (including API rate limiting)
+        const estimatedMinutes = Math.ceil((count * 15) / 60);
+        estimatedTimeEl.textContent = estimatedMinutes;
+      }
+
+      // Update lighting count
+      updateLightingCount();
+    }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', () => {
+      updateCameraPreview();
+      updateAngleSweepCount();
+
+      // Add listeners to sweep checkboxes
+      ['enable-rotation-sweep', 'enable-tilt-sweep', 'enable-zoom-sweep'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('change', updateAngleSweepCount);
+        }
+      });
+
+      // Add listeners to sliders (for manual mode)
+      ['rotation-slider', 'tilt-slider', 'zoom-slider'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('input', updateAngleSweepCount);
+        }
+      });
+
+      // Add listeners to lighting checkboxes
+      document.querySelectorAll('.lighting-presets input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', updateAngleSweepCount);
+      });
+
+      function updateLightingCount() {
+        const checkedLighting = document.querySelectorAll('.lighting-presets input[type="checkbox"]:checked').length;
+        document.getElementById('lighting-count').textContent = checkedLighting || 0;
+      }
+
+      // Initialize lighting count
+      document.addEventListener('DOMContentLoaded', () => {
+        updateLightingCount();
+      });
+
+      // Update lighting count display
+      function updateLightingCount() {
+        const checkedLighting = document.querySelectorAll('.lighting-presets input[type="checkbox"]:checked').length;
+        const lightingCountEl = document.getElementById('lighting-count');
+        if (lightingCountEl) {
+          lightingCountEl.textContent = checkedLighting || 0;
+        }
+      }
     });
   </script>
 </body>
