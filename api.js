@@ -138,106 +138,90 @@ class BriaFIBOAPI {
    */
   modifyStructuredPrompt(structuredPrompt, modifications) {
     const modified = JSON.parse(JSON.stringify(structuredPrompt));
+    // Ensure nested objects exist
+    modified.photographic_characteristics ??= {};
+    modified.lighting ??= {};
+    modified.materials_and_texture ??= {};
+    modified.aesthetics ??= {};
+    // ======================
+    // NEW CAMERA ANGLE SYSTEM
+    // ======================
+    // ======================
+    // NEW CAMERA ANGLE SYSTEM (STRONG ENFORCEMENT)
+    // ======================
+    const yaw = modifications.rotation_degrees ?? 0;
+    const pitch = modifications.tilt_degrees ?? 0;
+    const zoom = modifications.zoom_level ?? 5;
 
-    if (modifications.rotation_degrees !== undefined) {
-      // Rotation affects the description
-      let rotationDesc = '';
-      if (modifications.rotation_degrees < -30) {
-        rotationDesc = 'viewed from the left side';
-      } else if (modifications.rotation_degrees > 30) {
-        rotationDesc = 'viewed from the right side';
-      } else {
-        rotationDesc = 'viewed from the front';
+    const yawLabel =
+      yaw === 0 ? "directly in front of the subject" :
+        yaw < 0 ? `${Math.abs(yaw)}° to the left side (left 3/4 view)` :
+          `${yaw}° to the right side (right 3/4 view)`;
+
+    const pitchLabel =
+      pitch === 0 ? "at eye-level" :
+        pitch < 0 ? `${Math.abs(pitch)}° above the subject (high-angle top-down view)` :
+          `${pitch}° below the subject (low-angle upward view)`;
+
+    // ENHANCED ZOOM MAPPING
+    const zoomMap = {
+      0: {
+        dist: "very close to the subject (macro-like framing with strong perspective distortion)",
+        lens: "35mm wide-angle lens"
+      },
+      5: {
+        dist: "mid-distance (neutral perspective, natural proportions)",
+        lens: "50mm standard lens"
+      },
+      10: {
+        dist: "far from the subject (compressed perspective, telephoto look)",
+        lens: "85mm telephoto lens"
       }
+    };
+    const zoomInfo = zoomMap[zoom] || zoomMap[5];
 
-      // Add to short description if it exists
-      if (modified.short_description) {
-        modified.short_description = modified.short_description.replace(
-          /\.$/,
-          `, ${rotationDesc}.`
-        );
-      }
+    const naturalCamDescription =
+      `Camera positioned ${zoomInfo.dist}, ${pitchLabel}, facing ${yawLabel}. ` +
+      `Rendered using a ${zoomInfo.lens} for stable perspective.`;
 
-      // Also update camera angle based on rotation + tilt
-      if (modifications.tilt_degrees !== undefined) {
-        const tilt = modifications.tilt_degrees;
-        const rotation = modifications.rotation_degrees;
+    // Insert into structured prompt
+    modified.photographic_characteristics.camera_angle = naturalCamDescription;
+    modified.photographic_characteristics.camera_orientation_degrees = {
+      yaw_degrees: yaw,
+      pitch_degrees: pitch
+    };
+    modified.photographic_characteristics.distance_descriptor = zoomInfo.dist;
+    modified.photographic_characteristics.lens_focal_length = zoomInfo.lens;
 
-        let angleDesc = '';
-        if (tilt < -30) {
-          angleDesc = 'high-angle view looking down';
-        } else if (tilt > 30) {
-          angleDesc = 'low-angle view looking up';
-        } else {
-          angleDesc = 'eye-level view';
-        }
-
-        if (rotation < -30) {
-          angleDesc += ' from the left side';
-        } else if (rotation > 30) {
-          angleDesc += ' from the right side';
-        } else {
-          angleDesc += ' from the front';
-        }
-
-        modified.photographic_characteristics.camera_angle = angleDesc;
-      }
+    // Reinforce in short_description
+    if (modified.short_description) {
+      modified.short_description = modified.short_description.replace(/\.$/, "") +
+        `. ${naturalCamDescription}`;
     }
 
-    // Ensure required objects exist
-    if (!modified.photographic_characteristics) modified.photographic_characteristics = {};
-    if (!modified.lighting) modified.lighting = {};
-    if (!modified.aesthetics) modified.aesthetics = {};
-    if (!modified.materials_and_texture) modified.materials_and_texture = {};
-
-    // ===== CAMERA MODIFICATIONS =====
-    if (modifications.camera_angle) {
-      modified.photographic_characteristics.camera_angle = modifications.camera_angle;
-    }
-
-    if (modifications.focal_length) {
-      const focalLengthMap = {
-        'wide-angle': 'wide-angle lens (24mm)',
-        'standard': 'standard lens (50mm)',
-        'portrait': 'portrait lens (85mm)',
-        'telephoto': 'telephoto lens (135mm)'
-      };
-      modified.photographic_characteristics.lens_focal_length =
-        focalLengthMap[modifications.focal_length] || modifications.focal_length;
-    }
-
-    if (modifications.aperture) {
-      modified.photographic_characteristics.aperture_f = parseFloat(modifications.aperture);
-      // Add depth of field description
-      const aperture = parseFloat(modifications.aperture);
-      if (aperture <= 2.8) {
-        modified.photographic_characteristics.depth_of_field = 'very shallow, with sharp subject and heavily blurred background';
-      } else if (aperture <= 5.6) {
-        modified.photographic_characteristics.depth_of_field = 'shallow, with subject in focus and background softly blurred';
-      } else {
-        modified.photographic_characteristics.depth_of_field = 'deep, with most elements in sharp focus';
-      }
-    }
-
-    if (modifications.camera_distance) {
-      const distanceMap = {
-        'close': 'close-up distance, filling the frame',
-        'mid': 'mid-distance, balanced composition',
-        'far': 'far distance, environmental context'
-      };
-      modified.photographic_characteristics.distance_descriptor =
-        distanceMap[modifications.camera_distance] || modifications.camera_distance;
-    }
 
     // ===== LIGHTING MODIFICATIONS =====
     if (modifications.lighting_direction) {
-      const directionMap = {
-        'front-lit': 'soft, even lighting from the front, illuminating the subject directly',
-        'side-lit': 'dramatic side lighting from the left or right, creating strong shadows and highlights',
-        'back-lit': 'silhouetting backlight from behind, creating rim light and depth',
-        'top-lit': 'overhead lighting from above, creating downward shadows'
-      };
-      modified.lighting.direction = directionMap[modifications.lighting_direction] || modifications.lighting_direction;
+      if (modifications.lighting_direction === "side-lit") {
+        modified.lighting.direction =
+          yaw < 0
+            ? "strong directional light coming from camera-left, casting shadows to the right"
+            : yaw > 0
+              ? "strong directional light coming from camera-right, casting shadows to the left"
+              : "side lighting creating lateral shadows";
+      }
+      else if (modifications.lighting_direction === "front-lit") {
+        modified.lighting.direction =
+          "even, frontal lighting reducing shadows and illuminating the full subject";
+      }
+      else if (modifications.lighting_direction === "back-lit") {
+        modified.lighting.direction =
+          "backlighting from behind the subject, producing rim highlights and silhouette edges";
+      }
+      else if (modifications.lighting_direction === "top-lit") {
+        modified.lighting.direction =
+          "top-down lighting from above the subject, creating downward shadows";
+      }
     }
 
     // ENHANCED: Lighting quality with contrast and shadow behavior
