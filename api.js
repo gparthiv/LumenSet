@@ -1,7 +1,5 @@
-/**
- * FIBO DataForge - Bria API Wrapper
- * Handles rate limiting, async polling, and error handling
- */
+/* FIBO DataForge - Bria API Wrapper
+ * Handles rate limiting, async polling, and error handling */
 
 class BriaFIBOAPI {
   constructor(apiKey) {
@@ -14,9 +12,7 @@ class BriaFIBOAPI {
     this.maxPollAttempts = 60; // 2 minutes timeout
   }
 
-  /**
-   * Add request to queue with rate limiting
-   */
+  //Add request to queue with rate limiting
   async queueRequest(endpoint, body) {
     return new Promise((resolve, reject) => {
       this.requestQueue.push({ endpoint, body, resolve, reject });
@@ -24,9 +20,7 @@ class BriaFIBOAPI {
     });
   }
 
-  /**
-   * Process request queue with rate limiting
-   */
+  // Process request queue with rate limiting
   async processQueue() {
     if (this.processing || this.requestQueue.length === 0) return;
 
@@ -66,9 +60,7 @@ class BriaFIBOAPI {
     }
   }
 
-  /**
-   * Poll status URL until completion
-   */
+  // Poll status URL until completion
   async pollStatus(statusUrl, onProgress = null) {
     let attempts = 0;
 
@@ -105,12 +97,6 @@ class BriaFIBOAPI {
     throw new Error('Generation timeout (120 seconds exceeded)');
   }
 
-  /**
-   * Generate structured prompt from text description
-   * @param {string} prompt - Text description of object
-   * @param {Array} images - Optional reference images (base64)
-   * @returns {Object} - { structured_prompt: string, seed: number }
-   */
   async generateStructuredPrompt(prompt, images = null, onProgress = null) {
     const body = { prompt, sync: false };
     if (images && images.length > 0) {
@@ -130,25 +116,14 @@ class BriaFIBOAPI {
     throw new Error('No status URL in response');
   }
 
-  /**
-   * Modify structured prompt with new parameters
-   * @param {Object} structuredPrompt - Parsed JSON structured prompt
-   * @param {Object} modifications - Fields to modify
-   * @returns {string} - Modified JSON string
-   */
   modifyStructuredPrompt(structuredPrompt, modifications) {
     const modified = JSON.parse(JSON.stringify(structuredPrompt));
-    // Ensure nested objects exist
     modified.photographic_characteristics ??= {};
     modified.lighting ??= {};
     modified.materials_and_texture ??= {};
     modified.aesthetics ??= {};
-    // ======================
-    // NEW CAMERA ANGLE SYSTEM
-    // ======================
-    // ======================
+
     // NEW CAMERA ANGLE SYSTEM (STRONG ENFORCEMENT)
-    // ======================
     const yaw = modifications.rotation_degrees ?? 0;
     const pitch = modifications.tilt_degrees ?? 0;
     const zoom = modifications.zoom_level ?? 5;
@@ -200,7 +175,7 @@ class BriaFIBOAPI {
     }
 
 
-    // ===== LIGHTING MODIFICATIONS =====
+    // LIGHTING MODIFICATIONS
     if (modifications.lighting_direction) {
       if (modifications.lighting_direction === "side-lit") {
         modified.lighting.direction =
@@ -254,7 +229,7 @@ class BriaFIBOAPI {
       modified.lighting.color_temperature = tempMap[modifications.color_temperature] || modifications.color_temperature;
     }
 
-    // ===== BACKGROUND WITH HEX COLORS =====
+    // BACKGROUND WITH HEX COLORS
     if (modifications.background) {
       const backgroundMap = {
         'white-studio': 'clean, seamless white studio backdrop',
@@ -271,7 +246,7 @@ class BriaFIBOAPI {
       modified.background_setting = `seamless studio backdrop in ${colorName} color (hex ${modifications.background_color_hex}), with smooth, even tone`;
     }
 
-    // ===== SURFACE & MATERIALS =====
+    // SURFACE & MATERIALS
     if (modifications.surface_finish || modifications.surface_tone || modifications.surface_color_hex) {
       let surfaceDesc = '';
 
@@ -297,7 +272,7 @@ class BriaFIBOAPI {
       modified.materials_and_texture.surface_finish = surfaceDesc;
     }
 
-    // ===== IMPERFECTIONS =====
+    // IMPERFECTIONS
     if (modifications.add_imperfections && modifications.imperfection_types && modifications.imperfection_types.length > 0) {
       const imperfectionDesc = `realistic imperfections including visible ${modifications.imperfection_types.join(', ')}, adding authentic, handcrafted character`;
       modified.materials_and_texture.texture_notes = imperfectionDesc;
@@ -308,7 +283,7 @@ class BriaFIBOAPI {
       }
     }
 
-    // ===== COMPOSITION =====
+    // COMPOSITION
     if (modifications.negative_space) {
       modified.aesthetics.negative_space = modifications.negative_space;
       const spaceMap = {
@@ -319,7 +294,7 @@ class BriaFIBOAPI {
       modified.aesthetics.composition = (modified.aesthetics.composition || '') + ', ' + (spaceMap[modifications.negative_space] || '');
     }
 
-    // ===== MOOD =====
+    // MOOD
     if (modifications.mood && modifications.mood.length > 0) {
       modified.aesthetics.mood_atmosphere = modifications.mood.join(', ');
       // Enhance color scheme based on mood
@@ -335,12 +310,6 @@ class BriaFIBOAPI {
     return JSON.stringify(modified);
   }
 
-  /**
-   * Generate image from structured prompt
-   * @param {string} structuredPrompt - JSON structured prompt
-   * @param {number} seed - Optional seed for reproducibility
-   * @returns {Object} - { image_url: string, seed: number, structured_prompt: string }
-   */
   async generateImage(structuredPrompt, seed = null, onProgress = null) {
     const body = {
       structured_prompt: structuredPrompt,
@@ -365,13 +334,6 @@ class BriaFIBOAPI {
     throw new Error('No status URL in response');
   }
 
-  /**
-   * Generate dataset with parameter sweep
-   * @param {string} baseStructuredPrompt - Starting structured prompt
-   * @param {Array} variations - Array of modification objects
-   * @param {Function} onVariationComplete - Callback per variation
-   * @returns {Array} - Array of { image_url, metadata } objects
-   */
   async generateDataset(baseStructuredPrompt, variations, onVariationComplete = null) {
     const results = [];
     const baseParsed = JSON.parse(baseStructuredPrompt);
@@ -440,16 +402,12 @@ class BriaFIBOAPI {
     return results;
   }
 
-  /**
-   * Get remaining queue length
-   */
+  /*Get remaining queue length*/
   getQueueLength() {
     return this.requestQueue.length;
   }
 
-  /**
-   * Clear queue
-   */
+  /* Clear queue*/
   clearQueue() {
     this.requestQueue = [];
   }
@@ -458,27 +416,21 @@ class BriaFIBOAPI {
 // Export for use in other modules
 window.BriaFIBOAPI = BriaFIBOAPI;
 
-// ===== HELPER FUNCTIONS =====
-
-/**
- * Convert hex color to descriptive name
- */
+// HELPER FUNCTIONS
+// Convert hex color to descriptive name
 function hexToColorName(hex) {
   // Remove # if present
   hex = hex.replace('#', '');
-
   // Convert to RGB
   const r = parseInt(hex.substring(0, 2), 16);
   const g = parseInt(hex.substring(2, 4), 16);
   const b = parseInt(hex.substring(4, 6), 16);
-
   // Simple color name mapping
   const hue = rgbToHue(r, g, b);
   const saturation = rgbToSaturation(r, g, b);
   const lightness = rgbToLightness(r, g, b);
 
   let colorName = '';
-
   // Determine hue name
   if (saturation < 10) {
     // Grayscale

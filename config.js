@@ -6,7 +6,7 @@
 const CONFIG = {
     // Bria API Configuration
     // Replace with your actual API key before deployment
-    BRIA_API_KEY: '46601ee902014b92887c48ea0c40ff52', // ← PASTE YOUR KEY HERE
+    BRIA_API_KEY: '46601ee902014b92887c48ea0c40ff52',
     
     // Application Settings
     APP_MODE: 'production',

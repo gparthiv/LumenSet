@@ -1,19 +1,15 @@
-/**
- * FIBO DataForge - Dataset Generation Engine
- * Clean, Non-Repeating, Final Version
- */
+/* FIBO DataForge - Dataset Generation Engine
+ * Clean, Non-Repeating, Final Version */
 
-/* ------------------------------------------------------------
-   1) START DATASET GENERATION
------------------------------------------------------------- */
+//  1) START DATASET GENERATION
 document.getElementById('results-gallery').innerHTML = '';
 document.getElementById('results-section').style.display = 'none';
+
 async function startDatasetGeneration() {
   if (!api || !baseStructuredPrompt) {
     alert('Please complete previous steps first');
     return;
   }
-  // FIX: Clear old results before new run
   datasetResults = [];
   const gallery = document.getElementById('results-gallery');
   if (gallery) gallery.innerHTML = '';
@@ -42,7 +38,6 @@ async function startDatasetGeneration() {
 
     document.getElementById('progress-section').style.display = 'none';
     displayResults(results);
-
   } catch (error) {
     alert(`Generation failed: ${error.message}`);
     document.getElementById('parameters-section').style.display = 'block';
@@ -50,9 +45,7 @@ async function startDatasetGeneration() {
   }
 }
 
-/* ------------------------------------------------------------
-   2) BUILD VARIATIONS (RTZ × LIGHTING)
------------------------------------------------------------- */
+// 2) BUILD VARIATIONS (RTZ × LIGHTING)
 function buildVariations() {
   const variations = [];
 
@@ -94,7 +87,7 @@ function buildVariations() {
               zoom_level: zoom,
               lighting_direction,
               background,
-              focal_length: focalLength,   // ✅ FIXED
+              focal_length: focalLength,
               ...advancedMods
             }
           });
@@ -107,10 +100,7 @@ function buildVariations() {
 
   return variations;
 }
-/* ------------------------------------------------------------
-   3) CAMERA HELPERS
------------------------------------------------------------- */
-
+// 3) CAMERA HELPERS
 // Simple UI display label — NOT used in prompt
 function getCameraAngleFromRTZ(rotation, tilt) {
   if (tilt <= -45) return 'overhead';
@@ -134,9 +124,7 @@ function formatRTZ(rotation, tilt, zoom) {
   return `${rotLabel}, ${tiltLabel}, ${zoomLabel}`;
 }
 
-/* ------------------------------------------------------------
-   4) ADVANCED PARAMETERS
------------------------------------------------------------- */
+// 4) ADVANCED PARAMETERS
 function getAdvancedModifications() {
   const mods = {};
 
@@ -170,9 +158,7 @@ function getAdvancedModifications() {
   return mods;
 }
 
-/* ------------------------------------------------------------
-   5) PROGRESS BAR & LIVE IMAGE DISPLAY
------------------------------------------------------------- */
+// 5) PROGRESS BAR & LIVE IMAGE DISPLAY
 function onGenerationProgress(update) {
   const fill = document.getElementById('progress-fill');
   const text = document.getElementById('progress-text');
@@ -189,12 +175,12 @@ function onGenerationProgress(update) {
 
   if (update.status === 'completed') {
     text.textContent = `Completed ${update.name} (${update.index + 1}/${update.total})`;
-    current.innerHTML = `<strong>✅ Completed:</strong> ${update.name}<br><small>Seed: ${update.metadata.seed}</small>`;
+    current.innerHTML = `<strong> Completed:</strong> ${update.name}<br><small>Seed: ${update.metadata.seed}</small>`;
     displaySingleResult(update.metadata, update.index);
   }
 
   if (update.status === 'error') {
-    current.innerHTML = `<strong>❌ Error:</strong> ${update.name}<br><small style="color:red;">${update.error}</small>`;
+    current.innerHTML = `<strong> Error:</strong> ${update.name}<br><small style="color:red;">${update.error}</small>`;
   }
 }
 
@@ -231,10 +217,7 @@ function displaySingleResult(result, index) {
   gallery.appendChild(item);
 }
 
-/* ------------------------------------------------------------
-   6) OTHER UI HELPERS
------------------------------------------------------------- */
-
+// 6) OTHER UI HELPERS
 function displayResults() {
   const section = document.getElementById('results-section');
   section.style.display = 'block';
@@ -298,10 +281,7 @@ async function downloadSingleImage(index) {
   URL.revokeObjectURL(url);
 }
 
-/* ------------------------------------------------------------
-   7) STYLE INJECTION (SPINNER ETC.)
------------------------------------------------------------- */
-
+// 7) STYLE INJECTION (SPINNER ETC.)
 if (!document.getElementById('progressive-loading-styles')) {
   const styleEl = document.createElement('style');
   styleEl.id = 'progressive-loading-styles';

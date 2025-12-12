@@ -1,7 +1,6 @@
-/**
- * FIBO DataForge - Dataset ZIP Exporter
- * Creates downloadable ZIP with images + metadata
- */
+// FIBO DataForge - Dataset ZIP Exporter
+// Creates downloadable ZIP with images + metadata
+
 
 // Download complete dataset as ZIP
 async function downloadDataset() {
@@ -12,19 +11,19 @@ async function downloadDataset() {
 
     const button = event.target;
     button.disabled = true;
-    button.textContent = '📦 Creating ZIP...';
+    button.textContent = ' Creating ZIP...';
 
     try {
         await createDatasetZIP(datasetResults);
-        button.textContent = '✅ Downloaded!';
+        button.textContent = ' Downloaded!';
         setTimeout(() => {
             button.disabled = false;
-            button.textContent = '📥 Download Dataset (ZIP)';
+            button.textContent = 'Download Dataset (ZIP)';
         }, 2000);
     } catch (error) {
         alert('Export failed: ' + error.message);
         button.disabled = false;
-        button.textContent = '📥 Download Dataset (ZIP)';
+        button.textContent = 'Download Dataset (ZIP)';
     }
 }
 
