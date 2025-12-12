@@ -4,978 +4,992 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FIBO DataForge - Synthetic Dataset Generator</title>
+  <title>FIBO DataForge - Enterprise Dataset Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 
-<body>
-  <!-- Header -->
-  <header class="header">
+<div id="app-scale">
+
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="container header-content">
+        <div class="logo">
+          <img src="assets/icons/logo.png" alt="logo" style="width: 200px;">
+        </div>
+        <div class="tagline">Enterprise Synthetic Data Pipeline</div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
     <div class="container">
-      <h1 class="logo">📦 FIBO DataForge</h1>
-      <p class="tagline">Structured Synthetic Dataset Generator</p>
-      <p class="sub-tagline">Powered by Bria FIBO AI - Generate ML-ready datasets in minutes</p>
-    </div>
-  </header>
 
-  <!-- Value Propositions -->
-  <div class="container">
-    <div class="value-props">
-      <div class="prop">
-        <span class="prop-icon">⚡</span>
-        <strong>Lightning Fast</strong>
-        <small>10-15 sec per image</small>
-      </div>
-      <div class="prop">
-        <span class="prop-icon">🎯</span>
-        <strong>100% Reproducible</strong>
-        <small>Seed + JSON = Identical output</small>
-      </div>
-      <div class="prop">
-        <span class="prop-icon">📊</span>
-        <strong>Full Metadata</strong>
-        <small>Complete documentation</small>
-      </div>
-      <div class="prop">
-        <span class="prop-icon">🤖</span>
-        <strong>ML-Ready</strong>
-        <small>Perfect for training</small>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main Content -->
-  <main class="container">
-    <!-- Step 2: Object Description -->
-    <section class="card" id="object-section" style="display: none;">
-      <h2>📝 Step 1: Describe Your Object</h2>
-
-      <div class="tabs">
-        <button class="tab active" onclick="switchInputMode('text')">Text Description</button>
-        <button class="tab" onclick="switchInputMode('image')">Reference Image</button>
-      </div>
-
-      <div id="text-input-mode" class="input-mode">
-        <div class="form-group">
-          <label for="object-description">Object Description:</label>
-          <input type="text" id="object-description"
-            placeholder="e.g., industrial bolt with threading, agricultural tomato, robotic gripper component" value="">
-          <small>💡 Tip: Be specific for better results (materials, colors, textures)</small>
-        </div>
-      </div>
-
-      <div id="image-input-mode" class="input-mode" style="display: none;">
-        <div class="form-group">
-          <label>Upload Reference Image:</label>
-          <!-- fixed stray extra > -->
-          <input type="file" id="reference-image" accept="image/*" onchange="previewReferenceImage(event)">
-          <div id="image-preview" class="image-preview-container"></div>
-          <small>✨ For maximum consistency: Upload clear, well-lit reference photo</small>
-        </div>
-        <div class="form-group">
-          <label for="image-context">Detailed Description (Character Bible):</label>
-          <textarea id="image-context" rows="4"
-            placeholder="Describe key features: dimensions, materials, textures, colors, unique characteristics. More detail = better consistency across angles."></textarea>
-          <small>💡 Example: "Red tomato, 7cm diameter, smooth skin with slight green stem, minor natural
-            blemishes"</small>
-        </div>
-      </div>
-
-      <button class="btn btn-primary" onclick="generateBasePrompt()">
-        Generate Base Structure →
-      </button>
-      <div id="base-generation-status"></div>
-    </section>
-
-    <!-- Step 3: Parameter Controls -->
-    <section class="card" id="parameters-section" style="display: none;">
-      <div class="dataset-size-selector">
-        <h3>📊 Dataset Size</h3>
-        <div class="size-options">
-          <!-- data-size attributes added for programmatic wiring -->
-          <button class="size-btn active" data-size="quick" onclick="setDatasetSize('quick', event)">
-            <span class="size-label">Quick Test</span>
-            <span class="size-number">4-8 images</span>
-            <small>~2-4 minutes</small>
-          </button>
-
-          <button class="size-btn" data-size="standard" onclick="setDatasetSize('standard', event)">
-            <span class="size-label">Standard</span>
-            <span class="size-number">16-24 images</span>
-            <small>~8-12 minutes</small>
-          </button>
-
-          <button class="size-btn" data-size="medium" onclick="setDatasetSize('medium', event)">
-            <span class="size-label">Medium</span>
-            <span class="size-number">32-48 images</span>
-            <small>~16-24 minutes</small>
-          </button>
-
-          <button class="size-btn" data-size="large" onclick="setDatasetSize('large', event)">
-            <span class="size-label">Large ML Dataset</span>
-            <span class="size-number">64-96 images</span>
-            <small>~32-48 minutes</small>
-          </button>
-        </div>
-
-        <div class="dataset-recommendation">
-          <strong>💡 Recommendation:</strong> <span id="size-recommendation">Quick Test for initial validation</span>
-        </div>
-      </div>
-
-      <h2>🎛️ Step 2: Define Dataset Parameters</h2>
-
-      <div class="preset-selector">
-        <label>Quick Presets:</label>
-        <select id="preset-select" onchange="applyPreset()">
-          <option value="">Custom Configuration</option>
-          <option value="product_photography">Product Photography (4 angles)</option>
-          <option value="lighting_study">Lighting Study (4 directions)</option>
-          <option value="multi_angle">Multi-Angle Dataset (4 views)</option>
-        </select>
-      </div>
-
-      <div class="parameters-grid">
-        <!-- Camera Parameters -->
-        <div class="camera-control-panel">
-          <h3 style="font-size: 50px;">📷 Camera Controls</h3>
-
-          <!-- Rotation Control -->
-          <div class="camera-slider-group">
-            <label>
-              <span class="slider-label">🔄 Rotation (Left ← → Right)</span>
-              <span class="slider-value" id="rotation-value">0°</span>
-            </label>
-            <input type="range" id="rotation-slider" min="-90" max="90" value="0" step="45"
-              oninput="updateRotationValue(this.value)">
-            <div class="slider-markers">
-              <span>-90°</span>
-              <span>-45°</span>
-              <span>0°</span>
-              <span>45°</span>
-              <span>90°</span>
-            </div>
-            <small>Controls horizontal rotation around object</small>
-          </div>
-
-          <!-- Tilt Control -->
-          <div class="camera-slider-group">
-            <label>
-              <span class="slider-label">📐 Tilt (Up ↑ ↓ Down)</span>
-              <span class="slider-value" id="tilt-value">0°</span>
-            </label>
-            <input type="range" id="tilt-slider" min="-45" max="45" value="0" step="45"
-              oninput="updateTiltValue(this.value)">
-            <div class="slider-markers">
-              <span>-45° (Up)</span>
-              <span>0° (Level)</span>
-              <span>45° (Down)</span>
-            </div>
-            <small>Controls vertical camera angle</small>
-          </div>
-
-          <!-- Zoom Control -->
-          <div class="camera-slider-group">
-            <label>
-              <span class="slider-label">🔍 Zoom (Distance)</span>
-              <span class="slider-value" id="zoom-value">5</span>
-            </label>
-            <input type="range" id="zoom-slider" min="0" max="10" value="5" step="5"
-              oninput="updateZoomValue(this.value)">
-            <div class="slider-markers">
-              <span>0 (Close)</span>
-              <span>5 (Mid)</span>
-              <span>10 (Far)</span>
-            </div>
-            <small>Controls camera distance from subject</small>
-          </div>
-
-          <!-- Multi-Angle Sweep Generator -->
-          <div class="angle-sweep-section">
-            <h4>🔄 Generate Multi-Angle Sweep</h4>
-            <p class="sweep-description">Automatically generate images across all rotation/tilt combinations</p>
-
-            <div class="sweep-options">
-              <label>
-                <input type="checkbox" id="enable-rotation-sweep" checked>
-                <strong>Rotation Sweep</strong> (5 angles: -90° to 90°)
-              </label>
-              <label>
-                <input type="checkbox" id="enable-tilt-sweep">
-                <strong>Tilt Sweep</strong> (3 angles: -45°, 0°, 45°)
-              </label>
-              <label>
-                <input type="checkbox" id="enable-zoom-sweep">
-                <strong>Zoom Sweep</strong> (3 distances: close, mid, far)
-              </label>
-            </div>
-
-            <div class="sweep-summary">
-              <p>Total angles: <strong id="angle-sweep-count">5</strong> images</p>
-              <small id="angle-sweep-detail">Rotation: 5 angles × Lighting: 1 = 5 variations</small>
-            </div>
-          </div>
-
-          <!-- 3D Preview (Simple Visualization) -->
-          <div class="camera-preview-3d">
-            <h4>📸 Camera Position Preview</h4>
-            <div class="preview-container">
-              <div class="preview-object" id="preview-object">
-                <div class="object-cube"></div>
-              </div>
-              <div class="camera-indicator" id="camera-indicator">📷</div>
-            </div>
-            <p class="preview-label">
-              Position: <span id="preview-position">Front, Eye-Level, Mid-Distance</span>
-            </p>
+      <!-- Intro Value Props -->
+      <div class="value-props">
+        <div class="prop">
+          <span class="prop-icon"><img src="assets/icons/1.png" style="width: 35px;" alt="1"></span>
+          <div class="prop-text">
+            <strong>High Performance</strong>
+            <small>Batch Generation</small>
           </div>
         </div>
-
-        <!-- Lighting Controls (Simplified) -->
-        <div class="lighting-control-panel">
-          <h3>💡 Lighting Directions</h3>
-          <p class="control-description">Select one or multiple lighting directions for your dataset</p>
-
-          <!-- WRAPPER: lighting-presets is kept for UI, but we also provide an id="lighting-directions" for scripts -->
-          <div id="lighting-directions">
-            <div class="lighting-presets">
-              <label>
-                <input type="checkbox" name="lighting" value="front-lit" checked onchange="updateAngleSweepCount()">
-                <span class="preset-card">
-                  <span class="preset-icon">☀️</span>
-                  <strong>Front Light</strong>
-                  <small>Even illumination</small>
-                </span>
-              </label>
-
-              <label>
-                <input type="checkbox" name="lighting" value="side-lit" onchange="updateAngleSweepCount()">
-                <span class="preset-card">
-                  <span class="preset-icon">🌓</span>
-                  <strong>Side Light</strong>
-                  <small>Dramatic shadows</small>
-                </span>
-              </label>
-
-              <label>
-                <input type="checkbox" name="lighting" value="back-lit" onchange="updateAngleSweepCount()">
-                <span class="preset-card">
-                  <span class="preset-icon">🌅</span>
-                  <strong>Back Light</strong>
-                  <small>Rim lighting</small>
-                </span>
-              </label>
-
-              <label>
-                <input type="checkbox" name="lighting" value="top-lit" onchange="updateAngleSweepCount()">
-                <span class="preset-card">
-                  <span class="preset-icon">💡</span>
-                  <strong>Top Light</strong>
-                  <small>Overhead</small>
-                </span>
-              </label>
-            </div>
-          </div>
-
-          <div class="lighting-summary">
-            <p>Selected: <strong id="lighting-count">1</strong> lighting direction(s)</p>
+        <div class="prop">
+          <span class="prop-icon"><img src="assets/icons/2.png" style="width: 35px;" alt="2"></span>
+          <div class="prop-text">
+            <strong>100% Reproducible</strong>
+            <small>Seed Determinism</small>
           </div>
         </div>
-
-        <!-- Background Parameters -->
-        <div class="parameters-row">
-          <div class="param-group">
-            <h3>🎨 Background</h3>
-            <div class="radio-group" id="backgrounds">
-              <label><input type="radio" name="background" value="white-studio" checked> White Studio</label>
-              <label><input type="radio" name="background" value="black-studio"> Black Studio</label>
-              <label><input type="radio" name="background" value="wooden-surface"> Wooden Surface</label>
-              <label><input type="radio" name="background" value="fabric-texture"> Fabric</label>
-            </div>
+        <div class="prop">
+          <span class="prop-icon"><img src="assets/icons/3.png" style="width: 35px;" alt="3"></span>
+          <div class="prop-text">
+            <strong>Rich Metadata</strong>
+            <small>JSON Manifests</small>
           </div>
-
-          <!-- Focal Length -->
-          <div class="param-group">
-            <h3>🔍 Focal Length</h3>
-            <div class="radio-group" id="focal-lengths">
-              <label><input type="radio" name="focal-length" value="wide-angle"> Wide (24mm)</label>
-              <label><input type="radio" name="focal-length" value="standard" checked> Standard (50mm)</label>
-              <label><input type="radio" name="focal-length" value="portrait"> Portrait (85mm)</label>
-              <label><input type="radio" name="focal-length" value="telephoto"> Telephoto (135mm)</label>
-            </div>
+        </div>
+        <div class="prop">
+          <span class="prop-icon"><img src="assets/icons/4.png" style="width: 35px;" alt="4"></span>
+          <div class="prop-text">
+            <strong>ML-Ready</strong>
+            <small>Computer Vision Formats</small>
           </div>
         </div>
       </div>
 
-      <!-- Advanced Parameters Accordion -->
-      <div class="advanced-params-section">
-        <button class="accordion-toggle" onclick="toggleAdvancedParams()">
-          ⚙️ Advanced Parameters (Optional)
-          <span class="toggle-icon">▼</span>
+      <!-- Step 1: Object Description -->
+      <section class="card" id="object-section" style="display: none;">
+        <h2><span>1.</span> Define Object</h2>
+
+        <div class="tabs">
+          <button class="tab active" onclick="switchInputMode('text')">Text Prompt</button>
+          <button class="tab" onclick="switchInputMode('image')">Image Reference</button>
+        </div>
+
+        <div id="text-input-mode" class="input-mode">
+          <div class="form-group">
+            <label for="object-description">Object Description</label>
+            <input type="text" id="object-description"
+              placeholder="e.g., Industrial steel bolt with metric threading, matte finish" value="">
+          </div>
+        </div>
+
+        <div id="image-input-mode" class="input-mode" style="display: none;">
+          <div class="form-group">
+            <label>Reference Image Upload</label>
+            <input type="file" id="reference-image" accept="image/*" onchange="previewReferenceImage(event)">
+            <div id="image-preview" class="image-preview-container" style="margin-top:10px;"></div>
+          </div>
+          <div class="form-group">
+            <label for="image-context">Contextual Description (The "Bible")</label>
+            <textarea id="image-context" rows="3"
+              placeholder="Describe materials, dimensions, specific defects, and key visual markers to maintain consistency."></textarea>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-large" onclick="generateBasePrompt()">
+          Generate Base Structure →
         </button>
+        <div id="base-generation-status" style="margin-top: 15px;"></div>
+      </section>
 
-        <div id="advanced-params-content" class="accordion-content" style="display: none;">
-          <!-- (same advanced params markup — unchanged) -->
-          <!-- Color Control -->
-          <div class="param-group">
-            <h3>🎨 Color Control</h3>
-            <label>
-              <input type="checkbox" id="use-exact-colors">
-              Use Exact Colors (Hex)
-            </label>
-            <div id="color-inputs" style="display: none; margin-top: 10px;">
-              <div class="color-input-row">
-                <label>Background Color:</label>
-                <input type="color" id="bg-color" value="#FFFFFF">
-                <input type="text" id="bg-color-hex" value="#FFFFFF" placeholder="#FFFFFF">
+      <!-- Step 2: Parameter Controls -->
+      <section class="card" id="parameters-section" style="display: none;">
+
+        <div class="dataset-size-selector">
+          <h3>Dataset Configuration</h3>
+          <div class="size-options">
+            <button class="size-btn active" data-size="quick" onclick="setDatasetSize('quick', event)">
+              <span class="size-label">Quick Test</span>
+              <span class="size-number">4-8</span>
+              <small>Validation</small>
+            </button>
+
+            <button class="size-btn" data-size="standard" onclick="setDatasetSize('standard', event)">
+              <span class="size-label">Standard</span>
+              <span class="size-number">16-24</span>
+              <small>Training</small>
+            </button>
+
+            <button class="size-btn" data-size="medium" onclick="setDatasetSize('medium', event)">
+              <span class="size-label">Medium</span>
+              <span class="size-number">32-48</span>
+              <small>Robust</small>
+            </button>
+
+            <button class="size-btn" data-size="large" onclick="setDatasetSize('large', event)">
+              <span class="size-label">Large Scale</span>
+              <span class="size-number">64+</span>
+              <small>Production</small>
+            </button>
+          </div>
+          <div style="font-size: 0.9rem; color: var(--accent); margin-top: 10px;">
+            <span id="size-recommendation">Quick Test for initial validation</span>
+          </div>
+        </div>
+
+        <hr style="border:0; border-top:1px solid var(--border); margin: 30px 0;">
+
+        <h2><span>2.</span> Parameter Sweep</h2>
+
+        <div class="form-group" style="margin-bottom: 30px;">
+          <label>Preset Configuration</label>
+          <select id="preset-select" onchange="applyPreset()">
+            <option value="">Custom Configuration</option>
+            <option value="product_photography">E-Commerce (4 angles)</option>
+            <option value="lighting_study">Lighting Analysis (4 directions)</option>
+            <option value="multi_angle">360° Inspection (4 views)</option>
+          </select>
+        </div>
+
+        <div class="parameters-grid">
+          <!-- Camera Cockpit -->
+          <div class="camera-control-panel">
+            <h3>Camera Telemetry</h3>
+
+            <!-- Rotation -->
+            <div class="camera-slider-group">
+              <label>
+                <span>Azimuth (Rotation)</span>
+                <span class="slider-value" id="rotation-value">0°</span>
+              </label>
+              <input type="range" id="rotation-slider" min="-90" max="90" value="0" step="45"
+                oninput="updateRotationValue(this.value)">
+              <div class="slider-markers">
+                <span>-90°</span>
+                <span>0°</span>
+                <span>90°</span>
               </div>
-              <div class="color-input-row">
-                <label>Surface Color:</label>
-                <input type="color" id="surface-color" value="#8B7355">
-                <input type="text" id="surface-color-hex" value="#8B7355" placeholder="#8B7355">
+            </div>
+
+            <!-- Tilt -->
+            <div class="camera-slider-group">
+              <label>
+                <span>Elevation (Tilt)</span>
+                <span class="slider-value" id="tilt-value">0°</span>
+              </label>
+              <input type="range" id="tilt-slider" min="-45" max="45" value="0" step="45"
+                oninput="updateTiltValue(this.value)">
+              <div class="slider-markers">
+                <span>Up</span>
+                <span>Level</span>
+                <span>Down</span>
+              </div>
+            </div>
+
+            <!-- Zoom -->
+            <div class="camera-slider-group">
+              <label>
+                <span>Distance (Zoom)</span>
+                <span class="slider-value" id="zoom-value">5</span>
+              </label>
+              <input type="range" id="zoom-slider" min="0" max="10" value="5" step="5"
+                oninput="updateZoomValue(this.value)">
+              <div class="slider-markers">
+                <span>Macro</span>
+                <span>Mid</span>
+                <span>Tele</span>
+              </div>
+            </div>
+
+            <!-- Sweep Toggles -->
+            <div class="angle-sweep-section"
+              style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+              <label style="color: var(--text-main); margin-bottom: 12px;">Auto-Sweep Generation</label>
+              <div style="display:flex; gap: 15px; flex-wrap: wrap;">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <input type="checkbox" id="enable-rotation-sweep" checked>
+                  <span style="font-size:0.85rem; color: var(--text-secondary);">Rotation Sweep</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <input type="checkbox" id="enable-tilt-sweep">
+                  <span style="font-size:0.85rem; color: var(--text-secondary);">Tilt Sweep</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <input type="checkbox" id="enable-zoom-sweep">
+                  <span style="font-size:0.85rem; color: var(--text-secondary);">Zoom Sweep</span>
+                </label>
+              </div>
+              <div style="margin-top:10px; font-size: 0.8rem; color: var(--accent);">
+                Total Angles: <strong id="angle-sweep-count">5</strong> (<span id="angle-sweep-detail"></span>)
               </div>
             </div>
           </div>
 
-          <!-- Surface & Material -->
-          <div class="param-group">
-            <h3>🪵 Surface & Material</h3>
-            <div class="form-group">
-              <label>Surface Finish:</label>
-              <select id="surface-finish">
-                <option value="matte">Matte</option>
-                <option value="glossy">Glossy</option>
-                <option value="satin">Satin</option>
-                <option value="unglazed">Unglazed</option>
-              </select>
+          <!-- Right Column: Preview & Lighting -->
+          <div>
+            <!-- 3D Preview -->
+            <div class="camera-preview-3d">
+              <div class="preview-container">
+                <div class="preview-object" id="preview-object">
+                  <div class="object-cube"></div>
+                </div>
+                <div class="camera-indicator" id="camera-indicator">📷</div>
+              </div>
+              <p class="preview-label"
+                style="text-align:center; margin-top:10px; font-size:0.8rem; color: var(--text-tertiary);">
+                Simulated View: <span id="preview-position" style="color:var(--text-main);">Front, Eye-Level</span>
+              </p>
             </div>
-            <div class="form-group">
-              <label>Surface Tone:</label>
-              <select id="surface-tone">
-                <option value="neutral">Neutral</option>
-                <option value="warm">Warm</option>
-                <option value="cool">Cool</option>
-                <option value="dark">Dark</option>
-              </select>
-            </div>
-          </div>
 
-          <!-- Lighting Detail -->
-          <div class="param-group">
-            <h3>💡 Lighting Detail</h3>
-            <div class="form-group">
-              <label>Contrast:</label>
-              <select id="lighting-contrast">
-                <option value="low">Low</option>
-                <option value="medium" selected>Medium</option>
-                <option value="high">High</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Shadow Behavior:</label>
-              <select id="shadow-behavior">
-                <option value="soft edge" selected>Soft Edge</option>
-                <option value="hard edge">Hard Edge</option>
-                <option value="minimal">Minimal</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Color Temperature:</label>
-              <select id="color-temperature">
-                <option value="neutral-warm" selected>Neutral Warm</option>
-                <option value="neutral-cool">Neutral Cool</option>
-                <option value="warm">Warm</option>
-                <option value="cool">Cool</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Camera Technical -->
-          <div class="param-group">
-            <h3>📷 Camera Technical</h3>
-            <div class="form-group">
-              <label>Aperture (f-stop):</label>
-              <select id="aperture">
-                <option value="1.4">f/1.4 (Very Shallow)</option>
-                <option value="2.8">f/2.8 (Shallow)</option>
-                <option value="4.5" selected>f/4.5 (Medium)</option>
-                <option value="8">f/8 (Deep)</option>
-                <option value="16">f/16 (Very Deep)</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Distance:</label>
-              <select id="camera-distance">
-                <option value="close">Close-up</option>
-                <option value="mid" selected>Mid-distance</option>
-                <option value="far">Far</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Composition -->
-          <div class="param-group">
-            <h3>📐 Composition</h3>
-            <div class="form-group">
-              <label>Negative Space:</label>
-              <select id="negative-space">
-                <option value="minimal">Minimal</option>
-                <option value="medium" selected>Medium</option>
-                <option value="generous">Generous</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Camera Height:</label>
-              <select id="camera-height-detail">
-                <option value="low">Low (Below Subject)</option>
-                <option value="eye-level" selected>Eye-Level</option>
-                <option value="high">High (Above Subject)</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Realism & Imperfections -->
-          <div class="param-group">
-            <h3>✨ Realism & Detail</h3>
-            <label>
-              <input type="checkbox" id="add-imperfections" checked>
-              Add Realistic Imperfections
-            </label>
-            <div id="imperfection-types" style="margin-top: 10px;">
-              <label><input type="checkbox" value="fingerprints" checked> Fingerprints</label>
-              <label><input type="checkbox" value="tool marks" checked> Tool Marks</label>
-              <label><input type="checkbox" value="uneven edges" checked> Uneven Edges</label>
-              <label><input type="checkbox" value="slight scratches"> Slight Scratches</label>
-              <label><input type="checkbox" value="patina"> Patina/Age Marks</label>
-            </div>
-          </div>
-
-          <!-- Mood -->
-          <div class="param-group">
-            <h3>🎭 Mood</h3>
-            <div class="checkbox-group" id="mood-options">
-              <label><input type="checkbox" value="calm"> Calm</label>
-              <label><input type="checkbox" value="luxurious"> Luxurious</label>
-              <label><input type="checkbox" value="dramatic"> Dramatic</label>
-              <label><input type="checkbox" value="playful"> Playful</label>
-              <label><input type="checkbox" value="professional"> Professional</label>
-              <label><input type="checkbox" value="cozy"> Cozy</label>
+            <!-- Lighting -->
+            <div class="lighting-control-panel" style="margin-top: 24px;">
+              <h3>Lighting Environment</h3>
+              <!-- Hidden wrapper for logic script reference -->
+              <div id="lighting-directions">
+                <div class="lighting-presets">
+                  <label>
+                    <input type="checkbox" name="lighting" value="front-lit" checked onchange="updateAngleSweepCount()">
+                    <span class="preset-card">
+                      <span class="preset-icon">☀️</span>
+                      <strong>Front</strong>
+                    </span>
+                  </label>
+                  <label>
+                    <input type="checkbox" name="lighting" value="side-lit" onchange="updateAngleSweepCount()">
+                    <span class="preset-card">
+                      <span class="preset-icon">🌓</span>
+                      <strong>Side</strong>
+                    </span>
+                  </label>
+                  <label>
+                    <input type="checkbox" name="lighting" value="back-lit" onchange="updateAngleSweepCount()">
+                    <span class="preset-card">
+                      <span class="preset-icon">🌅</span>
+                      <strong>Back</strong>
+                    </span>
+                  </label>
+                  <label>
+                    <input type="checkbox" name="lighting" value="top-lit" onchange="updateAngleSweepCount()">
+                    <span class="preset-card">
+                      <span class="preset-icon">💡</span>
+                      <strong>Top</strong>
+                    </span>
+                  </label>
+                </div>
+              </div>
+              <div style="margin-top:10px; text-align:center; font-size:0.8rem; color: var(--text-secondary);">
+                Selected: <strong id="lighting-count">1</strong> setup(s)
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- Background & Focal Length (Compact) -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 24px;">
+          <div class="form-group">
+            <label>Environment Background</label>
+            <div id="backgrounds">
+              <select
+                onchange="document.querySelector(`input[name='background'][value='${this.value}']`).checked = true">
+                <option value="white-studio">White Studio</option>
+                <option value="black-studio">Black Studio</option>
+                <option value="wooden-surface">Wooden Surface</option>
+                <option value="fabric-texture">Fabric</option>
+              </select>
+              <!-- Hidden radios for JS compatibility -->
+              <div style="display:none;">
+                <input type="radio" name="background" value="white-studio" checked>
+                <input type="radio" name="background" value="black-studio">
+                <input type="radio" name="background" value="wooden-surface">
+                <input type="radio" name="background" value="fabric-texture">
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Lens Focal Length</label>
+            <div id="focal-lengths">
+              <select
+                onchange="document.querySelector(`input[name='focal-length'][value='${this.value}']`).checked = true">
+                <option value="standard">Standard (50mm)</option>
+                <option value="wide-angle">Wide (24mm)</option>
+                <option value="portrait">Portrait (85mm)</option>
+                <option value="telephoto">Telephoto (135mm)</option>
+              </select>
+              <!-- Hidden radios for JS compatibility -->
+              <div style="display:none;">
+                <input type="radio" name="focal-length" value="wide-angle">
+                <input type="radio" name="focal-length" value="standard" checked>
+                <input type="radio" name="focal-length" value="portrait">
+                <input type="radio" name="focal-length" value="telephoto">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Advanced Parameters -->
+        <div class="advanced-params-section">
+          <button class="accordion-toggle" onclick="toggleAdvancedParams()">
+            <span>Advanced Configuration</span>
+            <span class="toggle-icon">▼</span>
+          </button>
+
+          <div id="advanced-params-content" class="accordion-content" style="display: none;">
+
+            <!-- Color Control -->
+            <div class="param-group">
+              <label style="margin-bottom:10px; display:block; color:var(--accent);">Color Calibration</label>
+              <label style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                <input type="checkbox" id="use-exact-colors">
+                Use Exact Hex Codes
+              </label>
+              <div id="color-inputs" style="display: none;">
+                <div class="form-group">
+                  <label>Background Hex</label>
+                  <input type="text" id="bg-color-hex" value="#FFFFFF" placeholder="#FFFFFF">
+                </div>
+
+                <!-- Visible color picker -->
+                <div class="form-group">
+                  <label>Pick Background Color</label>
+                  <input type="color" id="bg-color" value="#FFFFFF">
+                </div>
+              </div>
+            </div>
+
+            <!-- Surface -->
+            <div class="param-group">
+              <label style="margin-bottom:10px; display:block; color:var(--accent);">Surface Physics</label>
+              <div class="form-group">
+                <label>Roughness/Finish</label>
+                <select id="surface-finish">
+                  <option value="matte">Matte</option>
+                  <option value="glossy">Glossy</option>
+                  <option value="satin">Satin</option>
+                  <option value="unglazed">Unglazed</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Tone</label>
+                <select id="surface-tone">
+                  <option value="neutral">Neutral</option>
+                  <option value="warm">Warm</option>
+                  <option value="cool">Cool</option>
+                  <option value="dark">Dark</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Lighting Detail -->
+            <div class="param-group">
+              <label style="margin-bottom:10px; display:block; color:var(--accent);">Lighting Detail</label>
+              <div class="form-group">
+                <label>Contrast Ratio</label>
+                <select id="lighting-contrast">
+                  <option value="low">Low</option>
+                  <option value="medium" selected>Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Shadow Hardness</label>
+                <select id="shadow-behavior">
+                  <option value="soft edge" selected>Soft Edge</option>
+                  <option value="hard edge">Hard Edge</option>
+                  <option value="minimal">Minimal</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Temp (Kelvin)</label>
+                <select id="color-temperature">
+                  <option value="neutral-warm" selected>4500K (Neutral Warm)</option>
+                  <option value="neutral-cool">5500K (Daylight)</option>
+                  <option value="warm">3000K (Tungsten)</option>
+                  <option value="cool">7000K (Cool White)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Technical -->
+            <div class="param-group">
+              <label style="margin-bottom:10px; display:block; color:var(--accent);">Camera Technical</label>
+              <div class="form-group">
+                <label>Aperture</label>
+                <select id="aperture">
+                  <option value="1.4">f/1.4 (Bokey)</option>
+                  <option value="4.5" selected>f/4.5 (Product)</option>
+                  <option value="16">f/16 (Deep Focus)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Composition</label>
+                <select id="negative-space">
+                  <option value="minimal">Tight Crop</option>
+                  <option value="medium" selected>Balanced</option>
+                  <option value="generous">Wide (For Text)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Mood & Imperfections (Checkbox Groups) -->
+            <div class="param-group simulated-realism-group">
+              <label style="margin-bottom:10px; display:block; color:var(--accent);">Simulated Realism</label>
+
+              <div style="display: flex; flex-wrap: wrap; gap: 40px;">
+                <div>
+                  <label style="margin-bottom:5px; font-weight:600;">Imperfections</label>
+                  <label><input type="checkbox" id="add-imperfections" checked> Enable</label>
+                  <div id="imperfection-types"
+                    style="margin-left:10px; margin-top:5px; color:var(--text-secondary); font-size:0.85rem;">
+                    <label><input type="checkbox" value="fingerprints" checked> Fingerprints</label>
+                    <label><input type="checkbox" value="tool marks" checked> Tool Marks</label>
+                    <label><input type="checkbox" value="uneven edges" checked> Uneven Edges</label>
+                  </div>
+                </div>
+
+                <div>
+                  <label style="margin-bottom:5px; font-weight:600;">Atmosphere</label>
+                  <div class="checkbox-group" id="mood-options" style="color:var(--text-secondary); font-size:0.85rem;">
+                    <label><input type="checkbox" value="calm"> Calm</label>
+                    <label><input type="checkbox" value="luxurious"> Luxurious</label>
+                    <label><input type="checkbox" value="dramatic"> Dramatic</label>
+                    <label><input type="checkbox" value="professional"> Professional</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Launch Pad -->
+        <div
+          style="margin-top: 30px; background: rgba(97, 47, 201, 0.1); padding: 20px; border-radius: var(--radius); border: 1px solid var(--primary);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <div>
+              <div style="font-size: 0.9rem; color: var(--text-secondary);">Total Asset Count</div>
+              <div style="font-size: 1.5rem; font-weight:700; color: var(--text-main);"><span
+                  id="total-variations">0</span> Files</div>
+            </div>
+            <div>
+              <div style="font-size: 0.9rem; color: var(--text-secondary);">Estimated Runtime</div>
+              <div style="font-size: 1.5rem; font-weight:700; color: var(--accent);"><span id="estimated-time">0</span>
+                min</div>
+            </div>
+          </div>
+          <button class="btn btn-success btn-large" onclick="startDatasetGeneration()">
+            Initialize Generation Sequence
+          </button>
+        </div>
+      </section>
+
+      <!-- Step 3: Progress -->
+      <section class="card" id="progress-section" style="display: none;">
+        <div style="text-align:center;">
+          <h2>Processing Data...</h2>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          <p class="progress-text" id="progress-text" style="color:var(--accent);">Initializing API Handshake...</p>
+          <div class="current-variation" id="current-variation"
+            style="margin-top:20px; padding:15px; background:rgba(0,0,0,0.3); border-radius:8px;"></div>
+        </div>
+      </section>
+
+      <!-- Step 4: Results -->
+      <section class="card" id="results-section" style="display: none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+          <h2>Dataset Generated Successfully</h2>
+          <div class="results-actions">
+            <button class="btn btn-secondary" onclick="viewMetadata()">Metadata JSON</button>
+            <button class="btn btn-secondary" onclick="startOver()">New Batch</button>
+            <button class="btn btn-success" onclick="downloadDataset()">Download ZIP</button>
+          </div>
+        </div>
+
+        <div class="gallery" id="results-gallery"></div>
+      </section>
+
+      <!-- Metadata Modal -->
+      <div id="metadata-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+          <span class="close" onclick="closeMetadataModal()">&times;</span>
+          <h3>Dataset Metadata Manifest</h3>
+          <pre id="metadata-viewer"></pre>
+        </div>
+      </div>
+      </main>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="container">
+          <p><strong>FIBO DataForge</strong> &bull; Enterprise Synthetic Data Generation</p>
+          <p style="margin-top:8px; font-size:0.75rem; opacity:0.6;">Powered by Bria FIBO AI Engine</p>
+        </div>
+      </footer>
+
+      <!-- Hidden compatibility block for legacy JS references -->
+      <div id="camera-angles" style="display:none;">
+        <label><input type="checkbox" value="eye-level" checked> eye-level</label>
+        <label><input type="checkbox" value="high-angle"> high-angle</label>
+        <label><input type="checkbox" value="low-angle"> low-angle</label>
+        <label><input type="checkbox" value="overhead"> overhead</label>
       </div>
 
-      <div class="generation-summary">
-        <p>Dataset will contain: <strong id="total-variations">0</strong> variations</p>
-        <p>Estimated time: <strong id="estimated-time">0</strong> minutes</p>
-      </div>
 
-      <button class="btn btn-success btn-large" onclick="startDatasetGeneration()">
-        🚀 Generate Dataset
-      </button>
-    </section>
+      <!-- Scripts (config first so window.CONFIG exists) -->
+      <script src="config.js"></script>
+      <script src="api.js"></script>
+      <script src="generator.js"></script>
+      <script src="exporter.js"></script>
 
-    <!-- Step 4: Generation Progress -->
-    <section class="card" id="progress-section" style="display: none;">
-      <h2>⏳ Generating Dataset...</h2>
+      <script>
+        // Global state
+        let api = null;
+        let baseStructuredPrompt = null;
+        let datasetResults = [];
+        let referenceImageBase64 = null;
+        let currentInputMode = 'text';
+        let selectedDatasetSize = 'quick';
 
-      <div class="progress-bar">
-        <div class="progress-fill" id="progress-fill"></div>
-      </div>
-      <p class="progress-text" id="progress-text">Initializing...</p>
+        // Preview reference image
+        function previewReferenceImage(event) {
+          const file = event.target.files[0];
+          if (!file) return;
 
-      <div class="current-variation" id="current-variation"></div>
-    </section>
+          if (!file.type.startsWith('image/')) {
+            alert('Please upload an image file');
+            return;
+          }
 
-    <!-- Step 5: Results Gallery -->
-    <section class="card" id="results-section" style="display: none;">
-      <h2>✅ Dataset Complete!</h2>
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const base64Data = e.target.result;
+            referenceImageBase64 = base64Data.split(',')[1];
 
-      <div class="results-actions">
-        <button class="btn btn-success" onclick="downloadDataset()">
-          📥 Download Dataset (ZIP)
-        </button>
-        <button class="btn btn-secondary" onclick="viewMetadata()">
-          📊 View All Metadata
-        </button>
-        <button class="btn btn-secondary" onclick="startOver()">
-          🔄 Generate Another Dataset
-        </button>
-      </div>
-
-      <div class="gallery" id="results-gallery"></div>
-    </section>
-
-    <!-- Metadata Viewer Modal -->
-    <div id="metadata-modal" class="modal" style="display: none;">
-      <div class="modal-content">
-        <span class="close" onclick="closeMetadataModal()">&times;</span>
-        <h2>📋 Dataset Metadata</h2>
-        <pre id="metadata-viewer"></pre>
-      </div>
-    </div>
-  </main>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <p><strong>FIBO DataForge</strong> - Enterprise-Grade Dataset Generation</p>
-    <p><small>Powered by Bria FIBO AI | Built for ML Professionals | © 2025</small></p>
-  </footer>
-
-  <!-- Hidden compatibility block for older functions that reference camera-angles -->
-  <!-- This keeps your UI intact but provides the inputs those functions expect -->
-  <div id="camera-angles" style="display:none;">
-    <label><input type="checkbox" value="eye-level" checked> eye-level</label>
-    <label><input type="checkbox" value="high-angle"> high-angle</label>
-    <label><input type="checkbox" value="low-angle"> low-angle</label>
-    <label><input type="checkbox" value="overhead"> overhead</label>
-  </div>
-
-  <!-- Scripts (config first so window.CONFIG exists) -->
-  <script src="config.js"></script>
-  <script src="api.js"></script>
-  <script src="generator.js"></script>
-  <script src="exporter.js"></script>
-
-  <script>
-    // Global state
-    let api = null;
-    let baseStructuredPrompt = null;
-    let datasetResults = [];
-    let referenceImageBase64 = null;
-    let currentInputMode = 'text';
-    let selectedDatasetSize = 'quick';
-
-    // Preview reference image
-    function previewReferenceImage(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      if (!file.type.startsWith('image/')) {
-        alert('Please upload an image file');
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const base64Data = e.target.result;
-        referenceImageBase64 = base64Data.split(',')[1];
-
-        const preview = document.getElementById('image-preview');
-        preview.innerHTML = `
+            const preview = document.getElementById('image-preview');
+            preview.innerHTML = `
             <div class="image-preview-container">
                 <img src="${base64Data}" class="preview-image" alt="Reference">
                 <div class="preview-info">
-                    <p><strong>✅ Image Loaded</strong></p>
+                    <p><strong> Image Loaded</strong></p>
                     <p>Size: ${(file.size / 1024).toFixed(2)} KB</p>
                     <p>Type: ${file.type}</p>
                     <small style="color: var(--success);">This image will guide all variations</small>
                 </div>
             </div>
         `;
-        console.log('Reference image loaded:', referenceImageBase64.substring(0, 50) + '...');
-      };
-      reader.readAsDataURL(file);
-    }
+            console.log('Reference image loaded:', referenceImageBase64.substring(0, 50) + '...');
+          };
+          reader.readAsDataURL(file);
+        }
 
-    // DOM ready initialization (single place)
-    document.addEventListener('DOMContentLoaded', () => {
-      // init API automatically if config provided
-      if (window.CONFIG && window.CONFIG.BRIA_API_KEY && !window.CONFIG.BRIA_API_KEY.includes('YOUR_API_KEY')) {
-        api = new BriaFIBOAPI(window.CONFIG.BRIA_API_KEY);
-        console.log('✅ API initialized automatically');
-        document.getElementById('object-section').style.display = 'block';
-      } else {
-        console.warn('⚠️ BRIA_API_KEY not configured or default placeholder detected.');
-        // keep object-section hidden; user can still init manually via UI if you add that later
-      }
+        // DOM ready initialization (single place)
+        document.addEventListener('DOMContentLoaded', () => {
+          // init API automatically if config provided
+          if (window.CONFIG && window.CONFIG.BRIA_API_KEY && !window.CONFIG.BRIA_API_KEY.includes('YOUR_API_KEY')) {
+            api = new BriaFIBOAPI(window.CONFIG.BRIA_API_KEY);
+            console.log(' API initialized automatically');
+            document.getElementById('object-section').style.display = 'block';
+          } else {
+            console.warn(' BRIA_API_KEY not configured or default placeholder detected.');
+            // keep object-section hidden; user can still init manually via UI if you add that later
+          }
 
-      // initial preview and counts
-      updateCameraPreview();
-      updateAngleSweepCount();
-
-      // wire sweep checkboxes
-      ['enable-rotation-sweep', 'enable-tilt-sweep', 'enable-zoom-sweep'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('change', updateAngleSweepCount);
-      });
-
-      // sliders
-      ['rotation-slider', 'tilt-slider', 'zoom-slider'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('input', () => {
+          // initial preview and counts
           updateCameraPreview();
           updateAngleSweepCount();
-          // manual change by user should release preset lock (if any)
-          // keep selectedDatasetSize but do not force override after manual change
-        });
-      });
 
-      // lighting checkboxes
-      document.querySelectorAll('.lighting-presets input[type="checkbox"], #lighting-directions input[type="checkbox"]').forEach(checkbox => {
-        checkbox.addEventListener('change', updateAngleSweepCount);
-      });
+          // wire sweep checkboxes
+          ['enable-rotation-sweep', 'enable-tilt-sweep', 'enable-zoom-sweep'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('change', updateAngleSweepCount);
+          });
 
-      // wire dataset-size buttons programmatically (they already have onclick, but ensure data-size support)
-      document.querySelectorAll('.size-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          // ensure event.target.closest works for nested spans/buttons
-          const ds = btn.dataset.size || btn.getAttribute('data-size') || 'quick';
-          setDatasetSize(ds, e);
-        });
-      });
+          // sliders
+          ['rotation-slider', 'tilt-slider', 'zoom-slider'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', () => {
+              updateCameraPreview();
+              updateAngleSweepCount();
+              // manual change by user should release preset lock (if any)
+              // keep selectedDatasetSize but do not force override after manual change
+            });
+          });
 
-      // wire preset-select
-      const presetSelect = document.getElementById('preset-select');
-      if (presetSelect) presetSelect.addEventListener('change', applyPreset);
+          // lighting checkboxes
+          document.querySelectorAll('.lighting-presets input[type="checkbox"], #lighting-directions input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', updateAngleSweepCount);
+          });
 
-      // HEX color picker toggle
-      const uec = document.getElementById('use-exact-colors');
-      if (uec) {
-        uec.addEventListener('change', () => {
-          const colorInputs = document.getElementById('color-inputs');
-          if (colorInputs) {
-            colorInputs.style.display = uec.checked ? 'block' : 'none';
+          // wire dataset-size buttons programmatically (they already have onclick, but ensure data-size support)
+          document.querySelectorAll('.size-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              // ensure event.target.closest works for nested spans/buttons
+              const ds = btn.dataset.size || btn.getAttribute('data-size') || 'quick';
+              setDatasetSize(ds, e);
+            });
+          });
+
+          // wire preset-select
+          const presetSelect = document.getElementById('preset-select');
+          if (presetSelect) presetSelect.addEventListener('change', applyPreset);
+
+          // HEX color picker toggle
+          const uec = document.getElementById('use-exact-colors');
+          if (uec) {
+            uec.addEventListener('change', () => {
+              const colorInputs = document.getElementById('color-inputs');
+              if (colorInputs) {
+                colorInputs.style.display = uec.checked ? 'block' : 'none';
+              }
+            });
           }
+          // Sync color picker → hex field
+          const hexInput = document.getElementById('bg-color-hex');
+          const colorPicker = document.getElementById('bg-color');
+
+          if (colorPicker && hexInput) {
+            colorPicker.addEventListener('input', () => {
+              hexInput.value = colorPicker.value.toUpperCase();
+            });
+
+            hexInput.addEventListener('input', () => {
+              if (/^#([0-9A-F]{3}){1,2}$/i.test(hexInput.value)) {
+                colorPicker.value = hexInput.value;
+              }
+            });
+          }
+
         });
-      }
 
-    });
+        // Switch input mode (keeps original behavior)
+        function switchInputMode(mode) {
+          currentInputMode = mode;
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          // event might not be present (call from code), find clicked tab
+          const tabs = Array.from(document.querySelectorAll('.tab'));
+          const activeTab = mode === 'text' ? tabs[0] : tabs[1];
+          if (activeTab) activeTab.classList.add('active');
 
-    // Switch input mode (keeps original behavior)
-    function switchInputMode(mode) {
-      currentInputMode = mode;
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      // event might not be present (call from code), find clicked tab
-      const tabs = Array.from(document.querySelectorAll('.tab'));
-      const activeTab = mode === 'text' ? tabs[0] : tabs[1];
-      if (activeTab) activeTab.classList.add('active');
+          document.getElementById('text-input-mode').style.display = mode === 'text' ? 'block' : 'none';
+          document.getElementById('image-input-mode').style.display = mode === 'image' ? 'block' : 'none';
+        }
 
-      document.getElementById('text-input-mode').style.display = mode === 'text' ? 'block' : 'none';
-      document.getElementById('image-input-mode').style.display = mode === 'image' ? 'block' : 'none';
-    }
-
-    // Generate base structured prompt - keeps existing behavior
-    async function generateBasePrompt() {
-      if (!api) {
-        alert('Please initialize API first');
-        return;
-      }
-
-      const statusEl = document.getElementById('base-generation-status');
-      statusEl.innerHTML = '<div class="loading">Generating structured prompt...</div>';
-
-      try {
-        let prompt, images = null;
-
-        if (currentInputMode === 'image') {
-          if (!referenceImageBase64) {
-            alert('Please upload a reference image first');
-            statusEl.innerHTML = '<div class="error">❌ No reference image uploaded</div>';
+        // Generate base structured prompt - keeps existing behavior
+        async function generateBasePrompt() {
+          if (!api) {
+            alert('Please initialize API first');
             return;
           }
 
-          const context = document.getElementById('image-context').value.trim();
-          prompt = context ? `Create variations of this subject maintaining exact visual characteristics. ${context}` :
-            'Create variations of this subject, maintaining all visual characteristics, proportions, colors, textures, and identity across different camera angles and lighting conditions.';
-          images = [referenceImageBase64];
-        } else {
-          prompt = document.getElementById('object-description').value.trim();
-          if (!prompt) {
-            alert('Please enter an object description');
-            statusEl.innerHTML = '';
-            return;
+          const statusEl = document.getElementById('base-generation-status');
+          statusEl.innerHTML = '<div class="loading">Generating structured prompt...</div>';
+
+          try {
+            let prompt, images = null;
+
+            if (currentInputMode === 'image') {
+              if (!referenceImageBase64) {
+                alert('Please upload a reference image first');
+                statusEl.innerHTML = '<div class="error"> No reference image uploaded</div>';
+                return;
+              }
+
+              const context = document.getElementById('image-context').value.trim();
+              prompt = context ? `Create variations of this subject maintaining exact visual characteristics. ${context}` :
+                'Create variations of this subject, maintaining all visual characteristics, proportions, colors, textures, and identity across different camera angles and lighting conditions.';
+              images = [referenceImageBase64];
+            } else {
+              prompt = document.getElementById('object-description').value.trim();
+              if (!prompt) {
+                alert('Please enter an object description');
+                statusEl.innerHTML = '';
+                return;
+              }
+            }
+
+            const result = await api.generateStructuredPrompt(prompt, images, (attempt, max) => {
+              statusEl.innerHTML = `<div class="loading">Processing with ${currentInputMode === 'image' ? 'reference image' : 'text description'}... (${attempt}/${max})</div>`;
+            });
+
+            baseStructuredPrompt = result.structured_prompt;
+            statusEl.innerHTML = `<div class="success"> Base structure generated from ${currentInputMode === 'image' ? 'reference image' : 'description'}!</div>`;
+            console.log('Structured prompt generated:', result);
+
+            setTimeout(() => {
+              document.getElementById('parameters-section').style.display = 'block';
+              document.getElementById('parameters-section').scrollIntoView({ behavior: 'smooth' });
+              updateAngleSweepCount();
+            }, 250);
+
+          } catch (error) {
+            console.error('Generation error:', error);
+            statusEl.innerHTML = `<div class="error"> Error: ${error.message}</div>`;
           }
         }
 
-        const result = await api.generateStructuredPrompt(prompt, images, (attempt, max) => {
-          statusEl.innerHTML = `<div class="loading">Processing with ${currentInputMode === 'image' ? 'reference image' : 'text description'}... (${attempt}/${max})</div>`;
-        });
+        // Update camera preview (unchanged)
+        function updateCameraPreview() {
+          const rotation = parseInt(document.getElementById('rotation-slider').value);
+          const tilt = parseInt(document.getElementById('tilt-slider').value);
+          const zoom = parseInt(document.getElementById('zoom-slider').value);
 
-        baseStructuredPrompt = result.structured_prompt;
-        statusEl.innerHTML = `<div class="success">✅ Base structure generated from ${currentInputMode === 'image' ? 'reference image' : 'description'}!</div>`;
-        console.log('Structured prompt generated:', result);
+          const object = document.getElementById('preview-object');
+          if (object) object.style.transform = `rotateY(${rotation}deg) rotateX(${-tilt}deg)`;
 
-        setTimeout(() => {
-          document.getElementById('parameters-section').style.display = 'block';
-          document.getElementById('parameters-section').scrollIntoView({ behavior: 'smooth' });
-          updateAngleSweepCount();
-        }, 250);
+          const camera = document.getElementById('camera-indicator');
+          if (camera) {
+            const radius = 60 + (zoom * 5);
+            const angleRad = (rotation * Math.PI) / 180;
+            const tiltRad = (tilt * Math.PI) / 180;
+            const x = 50 + Math.sin(angleRad) * radius;
+            const y = 50 + Math.sin(tiltRad) * 30;
+            camera.style.left = x + '%';
+            camera.style.top = y + '%';
+          }
 
-      } catch (error) {
-        console.error('Generation error:', error);
-        statusEl.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
-      }
-    }
+          const rotationLabel = rotation < -30 ? 'Left' : rotation > 30 ? 'Right' : 'Front';
+          const tiltLabel = tilt < -15 ? 'High' : tilt > 15 ? 'Low' : 'Eye-Level';
+          const zoomLabel = zoom === 0 ? 'Close' : zoom === 5 ? 'Mid-Distance' : 'Far';
+          const previewLabelEl = document.getElementById('preview-position');
+          if (previewLabelEl) previewLabelEl.textContent = `${rotationLabel}, ${tiltLabel}, ${zoomLabel}`;
+        }
 
-    // Update camera preview (unchanged)
-    function updateCameraPreview() {
-      const rotation = parseInt(document.getElementById('rotation-slider').value);
-      const tilt = parseInt(document.getElementById('tilt-slider').value);
-      const zoom = parseInt(document.getElementById('zoom-slider').value);
+        // Angle sweep & count logic (keeps same behavior but robust to missing nodes)
+        function updateAngleSweepCount() {
+          const rotationSweep = document.getElementById('enable-rotation-sweep')?.checked;
+          const tiltSweep = document.getElementById('enable-tilt-sweep')?.checked;
+          const zoomSweep = document.getElementById('enable-zoom-sweep')?.checked;
 
-      const object = document.getElementById('preview-object');
-      if (object) object.style.transform = `rotateY(${rotation}deg) rotateX(${-tilt}deg)`;
+          let count = 1;
+          const detail = [];
 
-      const camera = document.getElementById('camera-indicator');
-      if (camera) {
-        const radius = 60 + (zoom * 5);
-        const angleRad = (rotation * Math.PI) / 180;
-        const tiltRad = (tilt * Math.PI) / 180;
-        const x = 50 + Math.sin(angleRad) * radius;
-        const y = 50 + Math.sin(tiltRad) * 30;
-        camera.style.left = x + '%';
-        camera.style.top = y + '%';
-      }
+          if (rotationSweep) { count *= 5; detail.push('Rotation: 5'); } else { detail.push('Rotation: 1'); }
+          if (tiltSweep) { count *= 3; detail.push('Tilt: 3'); } else { detail.push('Tilt: 1'); }
+          if (zoomSweep) { count *= 3; detail.push('Zoom: 3'); } else { detail.push('Zoom: 1'); }
 
-      const rotationLabel = rotation < -30 ? 'Left' : rotation > 30 ? 'Right' : 'Front';
-      const tiltLabel = tilt < -15 ? 'High' : tilt > 15 ? 'Low' : 'Eye-Level';
-      const zoomLabel = zoom === 0 ? 'Close' : zoom === 5 ? 'Mid-Distance' : 'Far';
-      const previewLabelEl = document.getElementById('preview-position');
-      if (previewLabelEl) previewLabelEl.textContent = `${rotationLabel}, ${tiltLabel}, ${zoomLabel}`;
-    }
+          const selectedLighting = document.querySelectorAll('.lighting-presets input[type="checkbox"]:checked').length || 1;
+          count *= selectedLighting;
+          detail.push(`Lighting: ${selectedLighting}`);
 
-    // Angle sweep & count logic (keeps same behavior but robust to missing nodes)
-    function updateAngleSweepCount() {
-      const rotationSweep = document.getElementById('enable-rotation-sweep')?.checked;
-      const tiltSweep = document.getElementById('enable-tilt-sweep')?.checked;
-      const zoomSweep = document.getElementById('enable-zoom-sweep')?.checked;
+          const angleCountEl = document.getElementById('angle-sweep-count');
+          const angleDetailEl = document.getElementById('angle-sweep-detail');
+          if (angleCountEl) angleCountEl.textContent = count;
+          if (angleDetailEl) angleDetailEl.textContent = detail.join(' × ') + ` = ${count} variations`;
 
-      let count = 1;
-      const detail = [];
+          const totalVariationsEl = document.getElementById('total-variations');
+          const estimatedTimeEl = document.getElementById('estimated-time');
+          if (totalVariationsEl) totalVariationsEl.textContent = count;
+          if (estimatedTimeEl) {
+            const estimatedMinutes = Math.ceil((count * 15) / 60); // 15s per image
+            estimatedTimeEl.textContent = estimatedMinutes;
+          }
 
-      if (rotationSweep) { count *= 5; detail.push('Rotation: 5'); } else { detail.push('Rotation: 1'); }
-      if (tiltSweep) { count *= 3; detail.push('Tilt: 3'); } else { detail.push('Tilt: 1'); }
-      if (zoomSweep) { count *= 3; detail.push('Zoom: 3'); } else { detail.push('Zoom: 1'); }
+          updateLightingCount();
+        }
 
-      const selectedLighting = document.querySelectorAll('.lighting-presets input[type="checkbox"]:checked').length || 1;
-      count *= selectedLighting;
-      detail.push(`Lighting: ${selectedLighting}`);
+        function updateLightingCount() {
+          const checkedLighting = document.querySelectorAll('.lighting-presets input[type="checkbox"]:checked').length;
+          const lightingCountEl = document.getElementById('lighting-count');
+          if (lightingCountEl) {
+            lightingCountEl.textContent = checkedLighting || 0;
+          }
+        }
 
-      const angleCountEl = document.getElementById('angle-sweep-count');
-      const angleDetailEl = document.getElementById('angle-sweep-detail');
-      if (angleCountEl) angleCountEl.textContent = count;
-      if (angleDetailEl) angleDetailEl.textContent = detail.join(' × ') + ` = ${count} variations`;
+        // dataset-size behavior: selecting a dataset size forces presets (but manual changes afterwards override)
+        function setDatasetSize(size, event) {
+          selectedDatasetSize = size;
 
-      const totalVariationsEl = document.getElementById('total-variations');
-      const estimatedTimeEl = document.getElementById('estimated-time');
-      if (totalVariationsEl) totalVariationsEl.textContent = count;
-      if (estimatedTimeEl) {
-        const estimatedMinutes = Math.ceil((count * 15) / 60); // 15s per image
-        estimatedTimeEl.textContent = estimatedMinutes;
-      }
-
-      updateLightingCount();
-    }
-
-    function updateLightingCount() {
-      const checkedLighting = document.querySelectorAll('.lighting-presets input[type="checkbox"]:checked').length;
-      const lightingCountEl = document.getElementById('lighting-count');
-      if (lightingCountEl) {
-        lightingCountEl.textContent = checkedLighting || 0;
-      }
-    }
-
-    // dataset-size behavior: selecting a dataset size forces presets (but manual changes afterwards override)
-    function setDatasetSize(size, event) {
-      selectedDatasetSize = size;
-
-      // Update button active states
-      document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
-      // try to find the closest .size-btn from event.target, fallback to matching data-size button
-      try {
-        if (event && event.target && event.target.closest) {
-          const clicked = event.target.closest('.size-btn');
-          if (clicked) clicked.classList.add('active');
-          else {
+          // Update button active states
+          document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
+          // try to find the closest .size-btn from event.target, fallback to matching data-size button
+          try {
+            if (event && event.target && event.target.closest) {
+              const clicked = event.target.closest('.size-btn');
+              if (clicked) clicked.classList.add('active');
+              else {
+                const fallback = document.querySelector(`.size-btn[data-size="${size}"]`);
+                if (fallback) fallback.classList.add('active');
+              }
+            } else {
+              const fallback = document.querySelector(`.size-btn[data-size="${size}"]`);
+              if (fallback) fallback.classList.add('active');
+            }
+          } catch (e) {
             const fallback = document.querySelector(`.size-btn[data-size="${size}"]`);
             if (fallback) fallback.classList.add('active');
           }
-        } else {
-          const fallback = document.querySelector(`.size-btn[data-size="${size}"]`);
-          if (fallback) fallback.classList.add('active');
-        }
-      } catch (e) {
-        const fallback = document.querySelector(`.size-btn[data-size="${size}"]`);
-        if (fallback) fallback.classList.add('active');
-      }
 
-      const recommendations = {
-        'quick': 'Quick Test perfect for validation and demos',
-        'standard': 'Standard size good for initial model training',
-        'medium': 'Medium dataset suitable for small-scale ML projects',
-        'large': 'Large dataset recommended for production ML models (90 images)'
-      };
-      document.getElementById('size-recommendation').textContent = recommendations[size] || '';
+          const recommendations = {
+            'quick': 'Quick Test perfect for validation and demos',
+            'standard': 'Standard size good for initial model training',
+            'medium': 'Medium dataset suitable for small-scale ML projects',
+            'large': 'Large dataset recommended for production ML models (90 images)'
+          };
+          document.getElementById('size-recommendation').textContent = recommendations[size] || '';
 
-      // Apply preset behaviour per size:
-      if (size === 'quick') {
-        // Rotation sweep on (5), tilt off, zoom off, keep 1 lighting
-        document.getElementById('enable-rotation-sweep').checked = true;
-        document.getElementById('enable-tilt-sweep').checked = false;
-        document.getElementById('enable-zoom-sweep').checked = false;
+          // Apply preset behaviour per size:
+          if (size === 'quick') {
+            // Rotation sweep on (5), tilt off, zoom off, keep 1 lighting
+            document.getElementById('enable-rotation-sweep').checked = true;
+            document.getElementById('enable-tilt-sweep').checked = false;
+            document.getElementById('enable-zoom-sweep').checked = false;
 
-        // set sliders to defaults but allow user to change them later
-        document.getElementById('rotation-slider').value = 0;
-        document.getElementById('tilt-slider').value = 0;
-        document.getElementById('zoom-slider').value = 5;
+            // set sliders to defaults but allow user to change them later
+            document.getElementById('rotation-slider').value = 0;
+            document.getElementById('tilt-slider').value = 0;
+            document.getElementById('zoom-slider').value = 5;
 
-        // enforce only front-lit by default
-        document.querySelectorAll('#lighting-directions input[type="checkbox"]').forEach(cb => cb.checked = false);
-        const front = document.querySelector('#lighting-directions input[value="front-lit"]');
-        if (front) front.checked = true;
+            // enforce only front-lit by default
+            document.querySelectorAll('#lighting-directions input[type="checkbox"]').forEach(cb => cb.checked = false);
+            const front = document.querySelector('#lighting-directions input[value="front-lit"]');
+            if (front) front.checked = true;
 
-      } else if (size === 'standard') {
-        // rotation & tilt on, zoom off, 1 lighting
-        document.getElementById('enable-rotation-sweep').checked = true;
-        document.getElementById('enable-tilt-sweep').checked = true;
-        document.getElementById('enable-zoom-sweep').checked = false;
+          } else if (size === 'standard') {
+            // rotation & tilt on, zoom off, 1 lighting
+            document.getElementById('enable-rotation-sweep').checked = true;
+            document.getElementById('enable-tilt-sweep').checked = true;
+            document.getElementById('enable-zoom-sweep').checked = false;
 
-        document.querySelectorAll('#lighting-directions input[type="checkbox"]').forEach(cb => cb.checked = true);
+            document.querySelectorAll('#lighting-directions input[type="checkbox"]').forEach(cb => cb.checked = true);
 
-      } else if (size === 'medium') {
-        // rotation & tilt on, zoom off, multiple lightings
-        document.getElementById('enable-rotation-sweep').checked = true;
-        document.getElementById('enable-tilt-sweep').checked = true;
-        document.getElementById('enable-zoom-sweep').checked = false;
+          } else if (size === 'medium') {
+            // rotation & tilt on, zoom off, multiple lightings
+            document.getElementById('enable-rotation-sweep').checked = true;
+            document.getElementById('enable-tilt-sweep').checked = true;
+            document.getElementById('enable-zoom-sweep').checked = false;
 
-        // try to select 3 lighting (if available) - pick all
-        document.querySelectorAll('#lighting-directions input[type="checkbox"]').forEach(cb => cb.checked = true);
+            // try to select 3 lighting (if available) - pick all
+            document.querySelectorAll('#lighting-directions input[type="checkbox"]').forEach(cb => cb.checked = true);
 
-      } else if (size === 'large') {
-        // LARGE -> target 90 images: rotation(5) x tilt(3) x zoom(3) x lighting(2) = 90
-        document.getElementById('enable-rotation-sweep').checked = true;
-        document.getElementById('enable-tilt-sweep').checked = true;
-        document.getElementById('enable-zoom-sweep').checked = true;
+          } else if (size === 'large') {
+            // LARGE -> target 90 images: rotation(5) x tilt(3) x zoom(3) x lighting(2) = 90
+            document.getElementById('enable-rotation-sweep').checked = true;
+            document.getElementById('enable-tilt-sweep').checked = true;
+            document.getElementById('enable-zoom-sweep').checked = true;
 
-        // prefer two lighting options: front-lit + side-lit (fallback to whatever exists)
-        document.querySelectorAll('#lighting-directions input[type="checkbox"]').forEach(cb => cb.checked = false);
-        const prefer = ['front-lit', 'side-lit'];
-        prefer.forEach(v => {
-          const el = document.querySelector(`#lighting-directions input[value="${v}"]`);
-          if (el) el.checked = true;
-        });
+            // prefer two lighting options: front-lit + side-lit (fallback to whatever exists)
+            document.querySelectorAll('#lighting-directions input[type="checkbox"]').forEach(cb => cb.checked = false);
+            const prefer = ['front-lit', 'side-lit'];
+            prefer.forEach(v => {
+              const el = document.querySelector(`#lighting-directions input[value="${v}"]`);
+              if (el) el.checked = true;
+            });
 
-        // if prefer didn't find at least 2, check any first two available
-        const checkedNow = document.querySelectorAll('#lighting-directions input[type="checkbox"]:checked').length;
-        if (checkedNow < 2) {
-          const allLights = Array.from(document.querySelectorAll('#lighting-directions input[type="checkbox"]'));
-          for (let i = 0; i < allLights.length && i < 2; i++) {
-            allLights[i].checked = true;
+            // if prefer didn't find at least 2, check any first two available
+            const checkedNow = document.querySelectorAll('#lighting-directions input[type="checkbox"]:checked').length;
+            if (checkedNow < 2) {
+              const allLights = Array.from(document.querySelectorAll('#lighting-directions input[type="checkbox"]'));
+              for (let i = 0; i < allLights.length && i < 2; i++) {
+                allLights[i].checked = true;
+              }
+            }
+
+            // set sliders to extremes to reflect sweep (sliders are still usable)
+            document.getElementById('rotation-slider').value = 0;
+            document.getElementById('tilt-slider').value = 0;
+            document.getElementById('zoom-slider').value = 5;
           }
+
+          // After forcing settings, refresh counts
+          updateAngleSweepCount();
         }
 
-        // set sliders to extremes to reflect sweep (sliders are still usable)
-        document.getElementById('rotation-slider').value = 0;
-        document.getElementById('tilt-slider').value = 0;
-        document.getElementById('zoom-slider').value = 5;
-      }
+        // Apply preset (uses camera-angles hidden block to remain compatible)
+        function applyPreset() {
+          const preset = document.getElementById('preset-select').value;
+          if (!preset) return;
 
-      // After forcing settings, refresh counts
-      updateAngleSweepCount();
-    }
+          // Reset all camera & lighting inputs (compat wrappers)
+          document.querySelectorAll('#camera-angles input').forEach(cb => cb.checked = false);
+          document.querySelectorAll('#lighting-directions input').forEach(cb => cb.checked = false);
 
-    // Apply preset (uses camera-angles hidden block to remain compatible)
-    function applyPreset() {
-      const preset = document.getElementById('preset-select').value;
-      if (!preset) return;
+          if (preset === 'product_photography') {
+            ['eye-level', 'high-angle', 'overhead'].forEach(v => {
+              const el = document.querySelector(`#camera-angles input[value="${v}"]`);
+              if (el) el.checked = true;
+            });
+            const front = document.querySelector('#lighting-directions input[value="front-lit"]');
+            if (front) front.checked = true;
+          } else if (preset === 'lighting_study') {
+            const el = document.querySelector('#camera-angles input[value="eye-level"]');
+            if (el) el.checked = true;
+            document.querySelectorAll('#lighting-directions input').forEach(cb => cb.checked = true);
+          } else if (preset === 'multi_angle') {
+            document.querySelectorAll('#camera-angles input').forEach(cb => cb.checked = true);
+            const front = document.querySelector('#lighting-directions input[value="front-lit"]');
+            if (front) front.checked = true;
+          }
 
-      // Reset all camera & lighting inputs (compat wrappers)
-      document.querySelectorAll('#camera-angles input').forEach(cb => cb.checked = false);
-      document.querySelectorAll('#lighting-directions input').forEach(cb => cb.checked = false);
+          updateAngleSweepCount();
+        }
 
-      if (preset === 'product_photography') {
-        ['eye-level', 'high-angle', 'overhead'].forEach(v => {
-          const el = document.querySelector(`#camera-angles input[value="${v}"]`);
-          if (el) el.checked = true;
-        });
-        const front = document.querySelector('#lighting-directions input[value="front-lit"]');
-        if (front) front.checked = true;
-      } else if (preset === 'lighting_study') {
-        const el = document.querySelector('#camera-angles input[value="eye-level"]');
-        if (el) el.checked = true;
-        document.querySelectorAll('#lighting-directions input').forEach(cb => cb.checked = true);
-      } else if (preset === 'multi_angle') {
-        document.querySelectorAll('#camera-angles input').forEach(cb => cb.checked = true);
-        const front = document.querySelector('#lighting-directions input[value="front-lit"]');
-        if (front) front.checked = true;
-      }
+        // Helper: start over
+        function startOver() {
+          location.reload();
+        }
 
-      updateAngleSweepCount();
-    }
+        // tiny utility: sanitize filename
+        function sanitizeFilename(name) {
+          return name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        }
 
-    // Helper: start over
-    function startOver() {
-      location.reload();
-    }
+        // Modal helpers (metadata)
+        function viewMetadata() {
+          const modal = document.getElementById('metadata-modal');
+          const viewer = document.getElementById('metadata-viewer');
 
-    // tiny utility: sanitize filename
-    function sanitizeFilename(name) {
-      return name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    }
+          const manifestData = {
+            generated_at: new Date().toISOString(),
+            total_variations: datasetResults.length,
+            base_description: document.getElementById('object-description')?.value || '',
+            variations: datasetResults.map(r => ({
+              name: r.variation_name,
+              seed: r.seed,
+              modifications: r.modifications,
+              image_url: r.image_url
+            }))
+          };
 
-    // Modal helpers (metadata)
-    function viewMetadata() {
-      const modal = document.getElementById('metadata-modal');
-      const viewer = document.getElementById('metadata-viewer');
+          viewer.textContent = JSON.stringify(manifestData, null, 2);
+          modal.style.display = 'flex';
+        }
 
-      const manifestData = {
-        generated_at: new Date().toISOString(),
-        total_variations: datasetResults.length,
-        base_description: document.getElementById('object-description')?.value || '',
-        variations: datasetResults.map(r => ({
-          name: r.variation_name,
-          seed: r.seed,
-          modifications: r.modifications,
-          image_url: r.image_url
-        }))
-      };
+        function closeMetadataModal() {
+          document.getElementById('metadata-modal').style.display = 'none';
+        }
 
-      viewer.textContent = JSON.stringify(manifestData, null, 2);
-      modal.style.display = 'flex';
-    }
+        // Expose a couple functions globally that generator.js may call directly
+        window.getCameraAngleFromRTZ = function (rotation, tilt) {
+          // consistent with the generator helper used previously
+          if (tilt <= -45) return 'overhead';
+          if (tilt <= -30) return 'high-angle';
+          if (tilt >= 30) return 'low-angle';
+          if (rotation === 0 && tilt === 0) return 'eye-level';
+          return 'eye-level';
+        };
 
-    function closeMetadataModal() {
-      document.getElementById('metadata-modal').style.display = 'none';
-    }
+        window.getDistanceFromZoom = function (zoom) {
+          if (zoom === 0) return 'close';
+          if (zoom === 5) return 'mid';
+          if (zoom === 10) return 'far';
+          return 'mid';
+        };
 
-    // Expose a couple functions globally that generator.js may call directly
-    window.getCameraAngleFromRTZ = function (rotation, tilt) {
-      // consistent with the generator helper used previously
-      if (tilt <= -45) return 'overhead';
-      if (tilt <= -30) return 'high-angle';
-      if (tilt >= 30) return 'low-angle';
-      if (rotation === 0 && tilt === 0) return 'eye-level';
-      return 'eye-level';
-    };
+        // FIXED: Advanced Parameters Accordion Toggle (GLOBAL FUNCTION)
+        window.toggleAdvancedParams = function () {
+          const content = document.getElementById('advanced-params-content');
+          const button = document.querySelector('.accordion-toggle');
 
-    window.getDistanceFromZoom = function (zoom) {
-      if (zoom === 0) return 'close';
-      if (zoom === 5) return 'mid';
-      if (zoom === 10) return 'far';
-      return 'mid';
-    };
-    // ------------------------------------------------------------
-    // FIXED: Advanced Parameters Accordion Toggle (GLOBAL FUNCTION)
-    // ------------------------------------------------------------
-    window.toggleAdvancedParams = function () {
-      const content = document.getElementById('advanced-params-content');
-      const button = document.querySelector('.accordion-toggle');
+          if (!content || !button) return;
 
-      if (!content || !button) return;
+          const isOpen = content.style.display === 'grid';
 
-      const isOpen = content.style.display === 'grid';
+          if (isOpen) {
+            content.style.display = 'none';
+            button.classList.remove('active');
+          } else {
+            content.style.display = 'grid';
+            button.classList.add('active');
+          }
+        };
 
-      if (isOpen) {
-        content.style.display = 'none';
-        button.classList.remove('active');
-      } else {
-        content.style.display = 'grid';
-        button.classList.add('active');
-      }
-    };
+      </script>
+  </body>
+</div>
 
-  </script>
-</body>
 
 </html>
