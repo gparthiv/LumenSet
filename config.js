@@ -29,5 +29,5 @@ window.CONFIG = CONFIG;
 
 // Validation on load
 if (CONFIG.BRIA_API_KEY === '46601ee902014b92887c48ea0c40ff52') {
-    console.warn('⚠️ BRIA_API_KEY not configured in config.js');
+    console.warn('BRIA_API_KEY not configured in config.js');
 }
