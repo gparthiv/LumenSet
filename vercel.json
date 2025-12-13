@@ -12,11 +12,12 @@
         {
           "key": "X-Frame-Options",
           "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
         }
       ]
     }
-  ],
-  "env": {
-    "BRIA_API_KEY": "@bria-api-key-secret"
-  }
+  ]
 }
