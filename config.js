@@ -6,9 +6,8 @@
 const CONFIG = {
     // Bria API Configuration
     // Replace with your actual API key before deployment
-    BRIA_API_KEY: typeof window !== 'undefined' && window.ENV_BRIA_API_KEY
-        ? window.ENV_BRIA_API_KEY
-        : '46601ee902014b92887c48ea0c40ff52',
+    BRIA_API_KEY: '46601ee902014b92887c48ea0c40ff52', // Directly in code
+    APP_MODE: 'production',
 
     // Application Settings
     APP_MODE: 'production',
