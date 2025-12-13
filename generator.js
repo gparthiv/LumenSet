@@ -69,9 +69,9 @@ async function startDatasetGeneration() {
     // Generate base image WITHOUT seed (get random seed)
     const baseResult = await api.generateImage(baseModifiedPrompt, null);
 
-    const MASTER_SEED = baseResult.seed; // 🔒 LOCK THIS SEED FOR ALL VARIATIONS
+    const MASTER_SEED = baseResult.seed; //  LOCK THIS SEED FOR ALL VARIATIONS
 
-    console.log('🔒 MASTER SEED LOCKED:', MASTER_SEED);
+    console.log('MASTER SEED LOCKED:', MASTER_SEED);
 
     // Store base result
     datasetResults.push({
@@ -105,7 +105,7 @@ async function startDatasetGeneration() {
           variation.modifications
         );
 
-        // 🔑 USE THE SAME SEED FOR ALL VARIATIONS
+        //  USE THE SAME SEED FOR ALL VARIATIONS
         const result = await api.generateImage(modifiedPrompt, MASTER_SEED);
 
         // Add metadata
