@@ -1,4 +1,4 @@
-/* FIBO DataForge - Dataset Generation Engine
+/* LumenSet - Dataset Generation Engine
  * Clean, Non-Repeating, Final Version */
 
 //  1) START DATASET GENERATION

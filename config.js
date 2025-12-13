@@ -1,5 +1,5 @@
 /**
- * FIBO DataForge Configuration
+ * LumenSet Configuration
  * IMPORTANT: Keep this file private. Do not commit with real API key.
  */
 

@@ -1,4 +1,4 @@
-/* FIBO DataForge - Bria API Wrapper
+/* LumenSet - Bria API Wrapper
  * Handles rate limiting, async polling, and error handling */
 
 class BriaFIBOAPI {
