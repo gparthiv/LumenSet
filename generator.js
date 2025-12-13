@@ -20,10 +20,28 @@ async function startDatasetGeneration() {
   document.getElementById('progress-section').style.display = 'block';
   document.getElementById('progress-section').scrollIntoView({ behavior: 'smooth' });
 
-  const variations = buildVariations();
+  // ==========================================
+  // DECIDE GENERATION MODE
+  // ==========================================
+  const useManualQueue = manualAngleQueue.length > 0;
+  const useAutoSweep = !useManualQueue;
+
+  let variations;
+
+  if (useManualQueue) {
+    // Build variations from manual queue
+    variations = buildManualQueueVariations();
+    console.log('📐 Manual Queue Mode:', variations.length, 'variations');
+  } else {
+    // Build variations from sweep settings
+    variations = buildVariations();
+    console.log('🔄 Auto Sweep Mode:', variations.length, 'variations');
+  }
 
   if (!variations || variations.length === 0) {
-    alert('No variations generated. Please check sweep settings or lighting.');
+    alert('No variations to generate. Please check settings or add angles to queue.');
+    document.getElementById('parameters-section').style.display = 'block';
+    document.getElementById('progress-section').style.display = 'none';
     return;
   }
 
@@ -51,9 +69,9 @@ async function startDatasetGeneration() {
     // Generate base image WITHOUT seed (get random seed)
     const baseResult = await api.generateImage(baseModifiedPrompt, null);
 
-    const MASTER_SEED = baseResult.seed; // LOCK THIS SEED FOR ALL VARIATIONS
+    const MASTER_SEED = baseResult.seed; // 🔒 LOCK THIS SEED FOR ALL VARIATIONS
 
-    console.log('MASTER SEED LOCKED:', MASTER_SEED);
+    console.log('🔒 MASTER SEED LOCKED:', MASTER_SEED);
 
     // Store base result
     datasetResults.push({
@@ -87,7 +105,7 @@ async function startDatasetGeneration() {
           variation.modifications
         );
 
-        //USE THE SAME SEED FOR ALL VARIATIONS
+        // 🔑 USE THE SAME SEED FOR ALL VARIATIONS
         const result = await api.generateImage(modifiedPrompt, MASTER_SEED);
 
         // Add metadata
@@ -110,16 +128,52 @@ async function startDatasetGeneration() {
     }
 
     // ==========================================
-    // STEP 3: SHOW RESULTS
+    // STEP 3: SHOW RESULTS & CLEAR QUEUE
     // ==========================================
     document.getElementById('progress-section').style.display = 'none';
     displayResults();
+
+    // Clear manual queue after successful generation
+    if (useManualQueue) {
+      manualAngleQueue = [];
+      updateQueueDisplay();
+      showToast('✓ Manual queue completed and cleared', 'success');
+    }
 
   } catch (error) {
     alert(`Generation failed: ${error.message}`);
     document.getElementById('parameters-section').style.display = 'block';
     document.getElementById('progress-section').style.display = 'none';
   }
+}
+
+// ==========================================
+// NEW: Build variations from manual queue
+// ==========================================
+function buildManualQueueVariations() {
+  const variations = [];
+  let counter = 1;
+
+  manualAngleQueue.forEach(queueItem => {
+    // Create variations for each lighting direction
+    queueItem.lighting_directions.forEach(lighting_direction => {
+      variations.push({
+        name: `Manual ${counter}: ${queueItem.label} | ${lighting_direction}`,
+        modifications: {
+          rotation_degrees: queueItem.rotation_degrees,
+          tilt_degrees: queueItem.tilt_degrees,
+          zoom_level: queueItem.zoom_level,
+          lighting_direction: lighting_direction,
+          background: queueItem.background,
+          focal_length: queueItem.focal_length,
+          ...queueItem.advanced
+        }
+      });
+      counter++;
+    });
+  });
+
+  return variations;
 }
 
 // HELPER: Update progress UI
@@ -141,7 +195,6 @@ function updateProgressUI(message, current, total) {
 // 2) BUILD VARIATIONS (RTZ × LIGHTING)
 function buildVariations() {
   const variations = [];
-
   const rotationSweep = document.getElementById('enable-rotation-sweep')?.checked || false;
   const tiltSweep = document.getElementById('enable-tilt-sweep')?.checked || false;
   const zoomSweep = document.getElementById('enable-zoom-sweep')?.checked || false;
@@ -162,7 +215,6 @@ function buildVariations() {
 
   const background = document.querySelector('input[name="background"]:checked')?.value || 'white-studio';
   const focalLength = document.querySelector('input[name="focal-length"]:checked')?.value || 'standard';
-
   const advancedMods = getAdvancedModifications();
 
   let counter = 1;
@@ -171,7 +223,6 @@ function buildVariations() {
     for (const tilt of tiltAngles) {
       for (const zoom of zoomLevels) {
         for (const lighting_direction of lightingDirections) {
-
           variations.push({
             name: `Variation ${counter}: ${formatRTZ(rotation, tilt, zoom)} | ${lighting_direction}`,
             modifications: {
@@ -184,7 +235,6 @@ function buildVariations() {
               ...advancedMods
             }
           });
-
           counter++;
         }
       }
@@ -193,6 +243,7 @@ function buildVariations() {
 
   return variations;
 }
+
 // 3) CAMERA HELPERS
 // Simple UI display label — NOT used in prompt
 function getCameraAngleFromRTZ(rotation, tilt) {
