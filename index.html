@@ -91,7 +91,7 @@
         </div>
 
         <button class="btn btn-primary btn-large" onclick="generateBasePrompt()">
-          Generate Base Structure →
+          Generate Base Structure
         </button>
         <div id="base-generation-status" style="margin-top: 15px;"></div>
       </section>
@@ -217,6 +217,8 @@
                 Total Angles: <strong id="angle-sweep-count">5</strong> (<span id="angle-sweep-detail"></span>)
               </div>
             </div>
+
+
           </div>
 
           <!-- Right Column: Preview & Lighting -->
@@ -227,7 +229,7 @@
                 <div class="preview-object" id="preview-object">
                   <div class="object-cube"></div>
                 </div>
-                <div class="camera-indicator" id="camera-indicator">📷</div>
+                <div class="camera-indicator" id="camera-indicator"><img src="assets/icons/cam.png" alt="cam" style="width: 24px;"></div>
               </div>
               <p class="preview-label"
                 style="text-align:center; margin-top:10px; font-size:0.8rem; color: var(--text-tertiary);">
@@ -244,28 +246,29 @@
                   <label>
                     <input type="checkbox" name="lighting" value="front-lit" checked onchange="updateAngleSweepCount()">
                     <span class="preset-card">
-                      <span class="preset-icon">☀️</span>
+                      <span class="preset-icon"><img src="assets/icons/front.png" alt="front"
+                          style="width: 40px;"></span>
                       <strong>Front</strong>
                     </span>
                   </label>
                   <label>
                     <input type="checkbox" name="lighting" value="side-lit" onchange="updateAngleSweepCount()">
                     <span class="preset-card">
-                      <span class="preset-icon">🌓</span>
+                      <span class="preset-icon"><img src="assets/icons/side.png" alt="side" style="width: 40px;"></span>
                       <strong>Side</strong>
                     </span>
                   </label>
                   <label>
                     <input type="checkbox" name="lighting" value="back-lit" onchange="updateAngleSweepCount()">
                     <span class="preset-card">
-                      <span class="preset-icon">🌅</span>
+                      <span class="preset-icon"><img src="assets/icons/back.png" alt="back" style="width: 40px;"></span>
                       <strong>Back</strong>
                     </span>
                   </label>
                   <label>
                     <input type="checkbox" name="lighting" value="top-lit" onchange="updateAngleSweepCount()">
                     <span class="preset-card">
-                      <span class="preset-icon">💡</span>
+                      <span class="preset-icon"><img src="assets/icons/top.png" alt="top" style="width: 40px;"></span>
                       <strong>Top</strong>
                     </span>
                   </label>
@@ -502,6 +505,31 @@
         <div class="gallery" id="results-gallery"></div>
       </section>
 
+
+      <section class="card" id="proof-section" style="display: none;">
+        <h2>🔬 Disentanglement Proof</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 24px;">
+          Same object, same seed, same lighting, same background — <strong style="color: var(--accent);">ONLY camera
+            angle changed</strong>.
+          This demonstrates FIBO's unique ability to control individual parameters without affecting others.
+        </p>
+
+        <div class="proof-grid" id="proof-grid">
+          <!-- Will be populated with angle comparisons -->
+        </div>
+
+        <div
+          style="margin-top: 24px; padding: 20px; background: rgba(81, 192, 180, 0.1); border-radius: var(--radius); border: 1px solid var(--accent);">
+          <h4 style="color: var(--accent); margin-bottom: 12px;">Why This Matters</h4>
+          <ul style="color: var(--text-secondary); margin-left: 20px;">
+            <li>Traditional AI models change everything when you modify one parameter</li>
+            <li>FIBO's JSON structure enables <strong>disentangled control</strong></li>
+            <li>Perfect for ML training datasets requiring controlled variations</li>
+            <li>Reproducible results using seed + structured prompt</li>
+          </ul>
+        </div>
+      </section>
+
       <!-- Metadata Modal -->
       <div id="metadata-modal" class="modal" style="display: none;">
         <div class="modal-content">
@@ -511,6 +539,41 @@
         </div>
       </div>
       </main>
+
+      <div id="json-diff-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 1000px;">
+          <span class="close" onclick="closeJSONDiffModal()">&times;</span>
+          <h3>📊 JSON Parameter Comparison</h3>
+          <p style="color: var(--text-secondary); margin-bottom: 20px;">
+            Highlighted sections show what changed between variations
+          </p>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+              <h4 style="color: var(--accent); margin-bottom: 12px;">Baseline Variation</h4>
+              <select id="diff-baseline" onchange="updateJSONDiff()" style="width: 100%; margin-bottom: 12px;">
+                <!-- Populated by JS -->
+              </select>
+              <pre id="diff-json-1" style="max-height: 500px; overflow-y: auto;"></pre>
+            </div>
+
+            <div>
+              <h4 style="color: var(--primary); margin-bottom: 12px;">Compared Variation</h4>
+              <select id="diff-compare" onchange="updateJSONDiff()" style="width: 100%; margin-bottom: 12px;">
+                <!-- Populated by JS -->
+              </select>
+              <pre id="diff-json-2" style="max-height: 500px; overflow-y: auto;"></pre>
+            </div>
+          </div>
+
+          <div
+            style="margin-top: 20px; padding: 16px; background: rgba(97, 47, 201, 0.1); border-radius: var(--radius);">
+            <h4 style="color: var(--primary); margin-bottom: 8px;">Changes Detected:</h4>
+            <div id="diff-summary" style="color: var(--text-secondary);"></div>
+          </div>
+        </div>
+      </div>
+
 
       <!-- Footer -->
       <footer class="footer">
@@ -654,6 +717,37 @@
           }
 
         });
+
+        // Update rotation slider value display
+        function updateRotationValue(value) {
+          const display = document.getElementById('rotation-value');
+          if (display) {
+            display.textContent = `${value}°`;
+          }
+          updateCameraPreview();
+          updateAngleSweepCount();
+        }
+
+        // Update tilt slider value display
+        function updateTiltValue(value) {
+          const display = document.getElementById('tilt-value');
+          if (display) {
+            display.textContent = `${value}°`;
+          }
+          updateCameraPreview();
+          updateAngleSweepCount();
+        }
+
+        // Update zoom slider value display
+        function updateZoomValue(value) {
+          const display = document.getElementById('zoom-value');
+          if (display) {
+            const labels = { 0: 'Close', 5: 'Mid', 10: 'Far' };
+            display.textContent = labels[value] || value;
+          }
+          updateCameraPreview();
+          updateAngleSweepCount();
+        }
 
         // Switch input mode (keeps original behavior)
         function switchInputMode(mode) {
@@ -986,7 +1080,88 @@
             button.classList.add('active');
           }
         };
+        let currentDiffBaseline = 0;
+        let currentDiffCompare = 1;
 
+        function openJSONDiffModal() {
+          if (!datasetResults || datasetResults.length < 2) {
+            alert('Need at least 2 variations to compare');
+            return;
+          }
+
+          const modal = document.getElementById('json-diff-modal');
+          const baseline = document.getElementById('diff-baseline');
+          const compare = document.getElementById('diff-compare');
+
+          // Populate dropdowns
+          baseline.innerHTML = '';
+          compare.innerHTML = '';
+
+          datasetResults.forEach((result, i) => {
+            const option1 = document.createElement('option');
+            option1.value = i;
+            option1.textContent = result.variation_name;
+            baseline.appendChild(option1);
+
+            const option2 = option1.cloneNode(true);
+            compare.appendChild(option2);
+          });
+
+          baseline.value = 0;
+          compare.value = Math.min(1, datasetResults.length - 1);
+
+          updateJSONDiff();
+          modal.style.display = 'flex';
+        }
+
+        function closeJSONDiffModal() {
+          document.getElementById('json-diff-modal').style.display = 'none';
+        }
+
+        function updateJSONDiff() {
+          const baselineIdx = parseInt(document.getElementById('diff-baseline').value);
+          const compareIdx = parseInt(document.getElementById('diff-compare').value);
+
+          const baseline = datasetResults[baselineIdx];
+          const compare = datasetResults[compareIdx];
+
+          // Extract key modifications
+          const baseMods = baseline.modifications;
+          const compMods = compare.modifications;
+
+          // Highlight differences
+          const changes = [];
+
+          if (baseMods.rotation_degrees !== compMods.rotation_degrees) {
+            changes.push(`Camera Rotation: ${baseMods.rotation_degrees}° → ${compMods.rotation_degrees}°`);
+          }
+          if (baseMods.tilt_degrees !== compMods.tilt_degrees) {
+            changes.push(`Camera Tilt: ${baseMods.tilt_degrees}° → ${compMods.tilt_degrees}°`);
+          }
+          if (baseMods.zoom_level !== compMods.zoom_level) {
+            changes.push(`Zoom Level: ${baseMods.zoom_level} → ${compMods.zoom_level}`);
+          }
+          if (baseMods.lighting_direction !== compMods.lighting_direction) {
+            changes.push(`Lighting: ${baseMods.lighting_direction} → ${compMods.lighting_direction}`);
+          }
+
+          // Display JSON with highlighting
+          const json1 = document.getElementById('diff-json-1');
+          const json2 = document.getElementById('diff-json-2');
+
+          json1.textContent = JSON.stringify(baseline.structured_prompt, null, 2);
+          json2.textContent = JSON.stringify(compare.structured_prompt, null, 2);
+
+          // Display summary
+          const summary = document.getElementById('diff-summary');
+          if (changes.length === 0) {
+            summary.innerHTML = '<em>No parameter changes detected</em>';
+          } else {
+            summary.innerHTML = '<ul style="margin: 0; padding-left: 20px;">' +
+              changes.map(c => `<li style="margin: 4px 0;">${c}</li>`).join('') +
+              '</ul>';
+          }
+        }
       </script>
   </body>
 </div>
