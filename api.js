@@ -118,142 +118,185 @@ class BriaFIBOAPI {
 
   modifyStructuredPrompt(structuredPrompt, modifications) {
     const modified = JSON.parse(JSON.stringify(structuredPrompt));
+
+    // Initialize required sections
     modified.photographic_characteristics ??= {};
+    modified.composition ??= {};
     modified.lighting ??= {};
     modified.materials_and_texture ??= {};
     modified.aesthetics ??= {};
 
-    // NEW CAMERA ANGLE SYSTEM (STRONG ENFORCEMENT)
+    // ============================================
+    // CRITICAL FIX: FIBO'S EXACT CAMERA SCHEMA
+    // ============================================
     const yaw = modifications.rotation_degrees ?? 0;
     const pitch = modifications.tilt_degrees ?? 0;
     const zoom = modifications.zoom_level ?? 5;
 
-    const yawLabel =
-      yaw === 0 ? "directly in front of the subject" :
-        yaw < 0 ? `${Math.abs(yaw)}° to the left side (left 3/4 view)` :
-          `${yaw}° to the right side (right 3/4 view)`;
-
-    const pitchLabel =
-      pitch === 0 ? "at eye-level" :
-        pitch < 0 ? `${Math.abs(pitch)}° above the subject (high-angle top-down view)` :
-          `${pitch}° below the subject (low-angle upward view)`;
-
-    // ENHANCED ZOOM MAPPING
+    // Zoom mapping
     const zoomMap = {
-      0: {
-        dist: "very close to the subject (macro-like framing with strong perspective distortion)",
-        lens: "35mm wide-angle lens"
-      },
-      5: {
-        dist: "mid-distance (neutral perspective, natural proportions)",
-        lens: "50mm standard lens"
-      },
-      10: {
-        dist: "far from the subject (compressed perspective, telephoto look)",
-        lens: "85mm telephoto lens"
-      }
+      0: { dist: "close-up macro view", focal_mm: 35 },
+      5: { dist: "mid-distance standard view", focal_mm: 50 },
+      10: { dist: "telephoto far view", focal_mm: 85 }
     };
     const zoomInfo = zoomMap[zoom] || zoomMap[5];
 
-    const naturalCamDescription =
-      `Camera positioned ${zoomInfo.dist}, ${pitchLabel}, facing ${yawLabel}. ` +
-      `Rendered using a ${zoomInfo.lens} for stable perspective.`;
+    // ============================================
+    // METHOD 1: Use FIBO's camera_angle field
+    // ============================================
 
-    // Insert into structured prompt
-    modified.photographic_characteristics.camera_angle = naturalCamDescription;
-    modified.photographic_characteristics.camera_orientation_degrees = {
-      yaw_degrees: yaw,
-      pitch_degrees: pitch
-    };
-    modified.photographic_characteristics.distance_descriptor = zoomInfo.dist;
-    modified.photographic_characteristics.lens_focal_length = zoomInfo.lens;
+    // Build explicit camera angle description with STRONG directional cues
+    let cameraAngleDesc = "";
 
-    // Reinforce in short_description
-    if (modified.short_description) {
-      modified.short_description = modified.short_description.replace(/\.$/, "") +
-        `. ${naturalCamDescription}`;
+    // HORIZONTAL (Azimuth) - Be VERY explicit
+    if (yaw === 0) {
+      cameraAngleDesc = "Camera positioned directly in front of the subject at 0 degrees azimuth, capturing the front-facing view";
+    } else if (yaw === -90) {
+      cameraAngleDesc = "Camera positioned at the LEFT side of the subject at -90 degrees azimuth, capturing the full left profile side view from the subject's left";
+    } else if (yaw === -45) {
+      cameraAngleDesc = "Camera positioned at the LEFT FRONT quarter angle at -45 degrees azimuth, capturing a three-quarter view from the left side";
+    } else if (yaw === 45) {
+      cameraAngleDesc = "Camera positioned at the RIGHT FRONT quarter angle at 45 degrees azimuth, capturing a three-quarter view from the right side";
+    } else if (yaw === 90) {
+      cameraAngleDesc = "Camera positioned at the RIGHT side of the subject at 90 degrees azimuth, capturing the full right profile side view from the subject's right";
+    } else if (yaw < 0) {
+      cameraAngleDesc = `Camera positioned LEFT of the subject at ${yaw} degrees azimuth`;
+    } else {
+      cameraAngleDesc = `Camera positioned RIGHT of the subject at ${yaw} degrees azimuth`;
     }
 
+    // VERTICAL (Elevation/Pitch)
+    if (pitch === 0) {
+      cameraAngleDesc += ", at eye-level horizontal perspective";
+    } else if (pitch < 0) {
+      cameraAngleDesc += `, elevated ${Math.abs(pitch)} degrees above the subject looking downward`;
+    } else {
+      cameraAngleDesc += `, lowered ${pitch} degrees below the subject looking upward`;
+    }
+
+    // DISTANCE
+    cameraAngleDesc += `, positioned at ${zoomInfo.dist}`;
+
+    // Set camera angle (FIBO understands this field)
+    modified.photographic_characteristics.camera_angle = cameraAngleDesc;
+
+    // ============================================
+    // METHOD 2: Also add to composition (reinforcement)
+    // ============================================
+    modified.composition.camera_position = {
+      horizontal_angle: yaw,
+      vertical_angle: pitch,
+      distance: zoomInfo.dist
+    };
+
+    // Add viewpoint description
+    let viewpoint = "";
+    if (Math.abs(yaw) <= 15) viewpoint = "frontal straight-on view";
+    else if (yaw <= -75) viewpoint = "left profile side view";
+    else if (yaw <= -30) viewpoint = "left three-quarter view";
+    else if (yaw >= 75) viewpoint = "right profile side view";
+    else if (yaw >= 30) viewpoint = "right three-quarter view";
+
+    modified.composition.viewpoint = viewpoint;
+
+    // ============================================
+    // METHOD 3: Add to short_description (triple reinforcement)
+    // ============================================
+    if (modified.short_description) {
+      // Find if there's already a camera description and replace it
+      modified.short_description = modified.short_description.replace(
+        /Camera positioned.*?\./g,
+        ''
+      ).trim();
+
+      // Add new camera description at the END (FIBO pays attention to end of descriptions)
+      modified.short_description += `. ${cameraAngleDesc}.`;
+    } else {
+      modified.short_description = cameraAngleDesc;
+    }
+
+    // ============================================
+    // Add focal length
+    // ============================================
+    modified.photographic_characteristics.focal_length_mm = zoomInfo.focal_mm;
+    modified.photographic_characteristics.lens_type =
+      zoom === 0 ? "wide-angle lens" :
+        zoom === 5 ? "standard prime lens" :
+          "telephoto lens";
+
+    // ============================================
+    // REST OF YOUR EXISTING CODE (LIGHTING, etc.)
+    // ============================================
 
     // LIGHTING MODIFICATIONS
     if (modifications.lighting_direction) {
       if (modifications.lighting_direction === "side-lit") {
-        modified.lighting.direction =
-          yaw < 0
-            ? "strong directional light coming from camera-left, casting shadows to the right"
-            : yaw > 0
-              ? "strong directional light coming from camera-right, casting shadows to the left"
-              : "side lighting creating lateral shadows";
+        modified.lighting.direction = yaw < 0
+          ? "strong directional light from camera-left, casting shadows to the right"
+          : yaw > 0
+            ? "strong directional light from camera-right, casting shadows to the left"
+            : "side lighting creating lateral shadows";
       }
       else if (modifications.lighting_direction === "front-lit") {
-        modified.lighting.direction =
-          "even, frontal lighting reducing shadows and illuminating the full subject";
+        modified.lighting.direction = "even frontal lighting reducing shadows";
       }
       else if (modifications.lighting_direction === "back-lit") {
-        modified.lighting.direction =
-          "backlighting from behind the subject, producing rim highlights and silhouette edges";
+        modified.lighting.direction = "backlighting from behind the subject";
       }
       else if (modifications.lighting_direction === "top-lit") {
-        modified.lighting.direction =
-          "top-down lighting from above the subject, creating downward shadows";
+        modified.lighting.direction = "top-down lighting from above";
       }
     }
 
-    // ENHANCED: Lighting quality with contrast and shadow behavior
+    // Lighting quality
     let shadowDescription = 'soft, subtle shadows';
-    if (modifications.lighting_contrast) {
-      if (modifications.lighting_contrast === 'high') {
-        shadowDescription = 'strong, defined shadows with high contrast';
-      } else if (modifications.lighting_contrast === 'low') {
-        shadowDescription = 'very soft, barely visible shadows with low contrast';
-      }
+    if (modifications.lighting_contrast === 'high') {
+      shadowDescription = 'strong, defined shadows with high contrast';
+    } else if (modifications.lighting_contrast === 'low') {
+      shadowDescription = 'very soft, barely visible shadows';
     }
 
-    if (modifications.shadow_behavior) {
-      if (modifications.shadow_behavior === 'hard edge') {
-        shadowDescription = 'sharp, crisp shadows with hard edges';
-      } else if (modifications.shadow_behavior === 'minimal') {
-        shadowDescription = 'minimal, nearly absent shadows';
-      }
+    if (modifications.shadow_behavior === 'hard edge') {
+      shadowDescription = 'sharp, crisp shadows with hard edges';
+    } else if (modifications.shadow_behavior === 'minimal') {
+      shadowDescription = 'minimal, nearly absent shadows';
     }
 
     modified.lighting.shadows = shadowDescription;
 
     if (modifications.color_temperature) {
       const tempMap = {
-        'neutral-warm': 'neutral-warm color temperature (around 4500K)',
-        'neutral-cool': 'neutral-cool color temperature (around 5500K)',
-        'warm': 'warm, golden color temperature (around 3000K)',
-        'cool': 'cool, blue color temperature (around 7000K)'
+        'neutral-warm': 'neutral-warm color temperature (4500K)',
+        'neutral-cool': 'neutral-cool color temperature (5500K)',
+        'warm': 'warm, golden color temperature (3000K)',
+        'cool': 'cool, blue color temperature (7000K)'
       };
       modified.lighting.color_temperature = tempMap[modifications.color_temperature] || modifications.color_temperature;
     }
 
-    // BACKGROUND WITH HEX COLORS
+    // BACKGROUND
     if (modifications.background) {
       const backgroundMap = {
         'white-studio': 'clean, seamless white studio backdrop',
         'black-studio': 'dramatic, deep black studio backdrop',
-        'wooden-surface': 'natural wooden surface with visible grain and texture',
-        'fabric-texture': 'soft, textured fabric background with gentle folds'
+        'wooden-surface': 'natural wooden surface with visible grain',
+        'fabric-texture': 'soft, textured fabric background'
       };
       modified.background_setting = backgroundMap[modifications.background] || modifications.background;
     }
 
-    // HEX COLOR FIX: Convert to descriptive color
     if (modifications.background_color_hex) {
       const colorName = hexToColorName(modifications.background_color_hex);
-      modified.background_setting = `seamless studio backdrop in ${colorName} color (hex ${modifications.background_color_hex}), with smooth, even tone`;
+      modified.background_setting = `seamless studio backdrop in ${colorName} (${modifications.background_color_hex})`;
     }
 
     // SURFACE & MATERIALS
     if (modifications.surface_finish || modifications.surface_tone || modifications.surface_color_hex) {
       let surfaceDesc = '';
-
       if (modifications.surface_finish) {
         const finishMap = {
           'matte': 'matte, non-reflective',
-          'glossy': 'glossy, highly reflective with visible highlights',
+          'glossy': 'glossy, highly reflective',
           'satin': 'satin, subtle sheen',
           'unglazed': 'unglazed, raw texture'
         };
@@ -266,44 +309,39 @@ class BriaFIBOAPI {
 
       if (modifications.surface_color_hex) {
         const surfaceColorName = hexToColorName(modifications.surface_color_hex);
-        surfaceDesc += ` in ${surfaceColorName} color`;
+        surfaceDesc += ` in ${surfaceColorName}`;
       }
 
       modified.materials_and_texture.surface_finish = surfaceDesc;
     }
 
     // IMPERFECTIONS
-    if (modifications.add_imperfections && modifications.imperfection_types && modifications.imperfection_types.length > 0) {
-      const imperfectionDesc = `realistic imperfections including visible ${modifications.imperfection_types.join(', ')}, adding authentic, handcrafted character`;
+    if (modifications.add_imperfections && modifications.imperfection_types?.length > 0) {
+      const imperfectionDesc = `realistic imperfections including ${modifications.imperfection_types.join(', ')}`;
       modified.materials_and_texture.texture_notes = imperfectionDesc;
-
-      // Also add to short description for emphasis
-      if (modified.short_description) {
-        modified.short_description += ` The surface shows ${imperfectionDesc}.`;
-      }
     }
 
     // COMPOSITION
     if (modifications.negative_space) {
-      modified.aesthetics.negative_space = modifications.negative_space;
       const spaceMap = {
-        'minimal': 'minimal negative space, subject fills the frame',
-        'medium': 'balanced negative space around the subject',
-        'generous': 'generous negative space, subject with breathing room'
+        'minimal': 'minimal negative space, subject fills frame',
+        'medium': 'balanced negative space around subject',
+        'generous': 'generous negative space with breathing room'
       };
-      modified.aesthetics.composition = (modified.aesthetics.composition || '') + ', ' + (spaceMap[modifications.negative_space] || '');
+      modified.aesthetics.negative_space = modifications.negative_space;
+      modified.aesthetics.composition = spaceMap[modifications.negative_space] || '';
     }
 
     // MOOD
     if (modifications.mood && modifications.mood.length > 0) {
       modified.aesthetics.mood_atmosphere = modifications.mood.join(', ');
-      // Enhance color scheme based on mood
+
       if (modifications.mood.includes('luxurious')) {
-        modified.aesthetics.color_scheme = 'rich, sophisticated color palette with elegant tones';
+        modified.aesthetics.color_scheme = 'rich, sophisticated color palette';
       } else if (modifications.mood.includes('calm')) {
-        modified.aesthetics.color_scheme = 'soft, muted color palette with serene tones';
+        modified.aesthetics.color_scheme = 'soft, muted color palette';
       } else if (modifications.mood.includes('dramatic')) {
-        modified.aesthetics.color_scheme = 'high-contrast, bold color palette with striking tones';
+        modified.aesthetics.color_scheme = 'high-contrast, bold color palette';
       }
     }
 
