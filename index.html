@@ -21,7 +21,7 @@
         <div class="logo">
           <img src="assets/icons/logo.png" alt="logo" style="width: 200px;">
         </div>
-        <div class="tagline">Enterprise Synthetic Data Pipeline</div>
+        <div class="tagline">Deterministic Visual Dataset Generation</div>
       </div>
     </header>
 
@@ -56,6 +56,53 @@
           <div class="prop-text">
             <strong>ML-Ready</strong>
             <small>Computer Vision Formats</small>
+          </div>
+        </div>
+      </div>
+
+      <div id="api-key-modal" class="modal" style="display: flex;">
+        <div class="modal-content" style="max-width: 600px;">
+          <h2 style="margin-bottom: 20px;">Bria FIBO API Configuration</h2>
+
+          <div
+            style="background: rgba(255, 193, 7, 0.1); padding: 16px; border-radius: var(--radius); border: 1px solid #ffc107; margin-bottom: 20px;">
+            <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
+              <strong style="color: #ffc107;">Note for Judges:</strong><br>
+              The trial period of the demo API key expires on 22nd December. Please use your own Bria FIBO API key if
+              testing after mentioned date.
+            </p>
+          </div>
+
+          <div class="form-group">
+            <label for="user-api-key">Enter Your Bria FIBO API Key</label>
+            <input type="text" id="user-api-key" placeholder="46601ee902014b92887c48ea0c40ff52"
+              style="font-family: monospace;">
+            <small style="color: var(--text-tertiary); display: block; margin-top: 8px;">
+              Get your free API key at <a href="https://bria.ai" target="_blank"
+                style="color: var(--accent);">bria.ai/platform</a>
+            </small>
+          </div>
+
+          <div style="display: flex; gap: 12px; margin-top: 24px;">
+            <button class="btn btn-primary" onclick="setCustomAPIKey()" style="flex: 1;">
+              Use Custom Key
+            </button>
+            <button class="btn btn-secondary" onclick="useDemoAPIKey()" style="flex: 1;">
+              Use Demo Key (May Expire)
+            </button>
+          </div>
+
+          <div
+            style="margin-top: 20px; padding: 16px; background: rgba(81, 192, 180, 0.1); border-radius: var(--radius);">
+            <h4 style="color: var(--accent); margin-bottom: 8px; font-size: 0.9rem;">For Judges: Testing Instructions
+            </h4>
+            <ol style="color: var(--text-secondary); font-size: 0.85rem; margin-left: 20px;">
+              <li>Get free API key from <a href="https://platform.bria.ai/console/account/api-keys" target="_blank"
+                  style="color: var(--accent);">platform.bria.ai</a></li>
+              <li>Paste the "Production" API key above and click "Use Custom Key"</li>
+              <li>Or click "Use Demo Key" to try (may be rate-limited)</li>
+              <li>Generate datasets to test full functionality</li>
+            </ol>
           </div>
         </div>
       </div>
@@ -219,6 +266,74 @@
             </div>
 
 
+            <div class="manual-queue-section" style="
+  margin-top: 24px; 
+  padding-top: 24px; 
+  border-top: 1px solid var(--border);
+">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <label style="color: var(--text-main); margin: 0;">
+                  Manual Angle Queue
+                  <small style="display: block; color: var(--text-tertiary); font-weight: 400; margin-top: 4px;">
+                    Add custom angle combinations to your dataset
+                  </small>
+                </label>
+
+                <div style="display: flex; gap: 8px;">
+                  <button class="btn btn-small btn-secondary" onclick="addCurrentAngleToQueue()"
+                    title="Add current slider settings to queue">
+                    Add to Queue
+                  </button>
+                  <button class="btn btn-small btn-secondary" onclick="clearAngleQueue()"
+                    title="Clear all queued angles">
+                    Clear Queue
+                  </button>
+                </div>
+              </div>
+
+              <!-- Queue Display -->
+              <div id="angle-queue-display" style="
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    min-height: 60px;
+    max-height: 200px;
+    overflow-y: auto;
+  ">
+                <div id="queue-empty-state" style="
+      text-align: center;
+      color: var(--text-tertiary);
+      font-size: 0.85rem;
+      padding: 20px;
+    ">
+                  No custom angles added yet. Use the sliders above and click "Add to Queue"
+                </div>
+                <div id="queue-items" style="display: none;"></div>
+              </div>
+
+              <!-- Queue Summary -->
+              <div style="
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(97, 47, 201, 0.1);
+    border-radius: var(--radius-sm);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  ">
+                <div>
+                  <span style="color: var(--text-secondary); font-size: 0.85rem;">Queued Angles:</span>
+                  <strong id="queue-count"
+                    style="color: var(--primary); margin-left: 8px; font-size: 1.1rem;">0</strong>
+                </div>
+                <div style="color: var(--text-tertiary); font-size: 0.8rem;">
+                  Each angle × <span id="queue-lighting-multiplier">1</span> lighting =
+                  <strong id="queue-total-images" style="color: var(--accent);">0</strong> images
+                </div>
+              </div>
+            </div>
+
           </div>
 
           <!-- Right Column: Preview & Lighting -->
@@ -229,7 +344,8 @@
                 <div class="preview-object" id="preview-object">
                   <div class="object-cube"></div>
                 </div>
-                <div class="camera-indicator" id="camera-indicator"><img src="assets/icons/cam.png" alt="cam" style="width: 24px;"></div>
+                <div class="camera-indicator" id="camera-indicator"><img src="assets/icons/cam.png" alt="cam"
+                    style="width: 24px;"></div>
               </div>
               <p class="preview-label"
                 style="text-align:center; margin-top:10px; font-size:0.8rem; color: var(--text-tertiary);">
@@ -462,6 +578,26 @@
           style="margin-top: 30px; background: rgba(97, 47, 201, 0.1); padding: 20px; border-radius: var(--radius); border: 1px solid var(--primary);">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <div>
+              <div style="
+  margin-bottom: 20px;
+  padding: 16px;
+  background: rgba(81, 192, 180, 0.1);
+  border-radius: var(--radius);
+  border: 1px solid var(--accent);
+">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                  <div>
+                    <strong id="mode-title" style="color: var(--accent); font-size: 1rem;">Auto Sweep Mode</strong>
+                    <p id="mode-description" style="margin: 0; font-size: 0.85rem; color: var(--text-secondary);">
+                      Using parameter sweeps from toggles above
+                    </p>
+                  </div>
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-tertiary);">
+                  Tip: <span id="mode-tip">Add custom angles to queue for manual control, or use sweeps for batch
+                    generation</span>
+                </div>
+              </div>
               <div style="font-size: 0.9rem; color: var(--text-secondary);">Total Asset Count</div>
               <div style="font-size: 1.5rem; font-weight:700; color: var(--text-main);"><span
                   id="total-variations">0</span> Files</div>
@@ -531,8 +667,8 @@
       </section>
 
       <!-- Metadata Modal -->
-      <div id="metadata-modal" class="modal" style="display: none;">
-        <div class="modal-content">
+      <div id="metadata-modal" class="metadata-modal" style="display: none;">
+        <div class="metadata-modal-content">
           <span class="close" onclick="closeMetadataModal()">&times;</span>
           <h3>Dataset Metadata Manifest</h3>
           <pre id="metadata-viewer"></pre>
@@ -540,46 +676,41 @@
       </div>
       </main>
 
-      <div id="json-diff-modal" class="modal" style="display: none;">
-        <div class="modal-content" style="max-width: 1000px;">
-          <span class="close" onclick="closeJSONDiffModal()">&times;</span>
-          <h3>📊 JSON Parameter Comparison</h3>
-          <p style="color: var(--text-secondary); margin-bottom: 20px;">
-            Highlighted sections show what changed between variations
-          </p>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <div>
-              <h4 style="color: var(--accent); margin-bottom: 12px;">Baseline Variation</h4>
-              <select id="diff-baseline" onchange="updateJSONDiff()" style="width: 100%; margin-bottom: 12px;">
-                <!-- Populated by JS -->
-              </select>
-              <pre id="diff-json-1" style="max-height: 500px; overflow-y: auto;"></pre>
-            </div>
-
-            <div>
-              <h4 style="color: var(--primary); margin-bottom: 12px;">Compared Variation</h4>
-              <select id="diff-compare" onchange="updateJSONDiff()" style="width: 100%; margin-bottom: 12px;">
-                <!-- Populated by JS -->
-              </select>
-              <pre id="diff-json-2" style="max-height: 500px; overflow-y: auto;"></pre>
-            </div>
-          </div>
-
-          <div
-            style="margin-top: 20px; padding: 16px; background: rgba(97, 47, 201, 0.1); border-radius: var(--radius);">
-            <h4 style="color: var(--primary); margin-bottom: 8px;">Changes Detected:</h4>
-            <div id="diff-summary" style="color: var(--text-secondary);"></div>
-          </div>
-        </div>
-      </div>
-
-
       <!-- Footer -->
       <footer class="footer">
-        <div class="container">
-          <p><strong>FIBO DataForge</strong> &bull; Enterprise Synthetic Data Generation</p>
-          <p style="margin-top:8px; font-size:0.75rem; opacity:0.6;">Powered by Bria FIBO AI Engine</p>
+        <div class="container footer-grid">
+
+          <!-- Sponsors -->
+          <div class="footer-col">
+            <h4>Hackathon Sponsors</h4>
+            <div class="footer-logos">
+              <img src="/assets/icons/bria.png" alt="Bria AI" />
+              <img src="/assets/icons/fal.png" alt="FAL AI" />
+              <img src="/assets/icons/nvidia.png" alt="NVIDIA" />
+            </div>
+          </div>
+
+          <!-- Built For -->
+          <div class="footer-col footer-center">
+            <h4>Built For</h4>
+            <p class="footer-highlight">FIBO Hackathon 2025</p>
+          </div>
+
+          <!-- Creator -->
+          <div class="footer-col footer-right">
+            <h4>Created By</h4>
+            <p class="footer-highlight">Parthiv Ghosh</p>
+
+            <div class="footer-socials">
+              <a href="https://linkedin.com/in/yourprofile" target="_blank" aria-label="LinkedIn">
+                <img src="/assets/icons/linkedin.webp" alt="LinkedIn" />
+              </a>
+              <a href="https://github.com/yourprofile" target="_blank" aria-label="GitHub">
+                <img src="/assets/icons/github.webp" alt="GitHub" />
+              </a>
+            </div>
+          </div>
+
         </div>
       </footer>
 
@@ -640,7 +771,50 @@
         }
 
         // DOM ready initialization (single place)
+        function updateRotationValue(value) {
+          const display = document.getElementById('rotation-value');
+          if (display) {
+            display.textContent = `${value}°`;
+          }
+          updateCameraPreview();
+          updateAngleSweepCount();
+        }
+
+        // Update tilt slider value display
+        function updateTiltValue(value) {
+          const display = document.getElementById('tilt-value');
+          if (display) {
+            display.textContent = `${value}°`;
+          }
+          updateCameraPreview();
+          updateAngleSweepCount();
+        }
+
+        // Update zoom slider value display
+        function updateZoomValue(value) {
+          const display = document.getElementById('zoom-value');
+          if (display) {
+            const labels = { 0: 'Close', 5: 'Mid', 10: 'Far' };
+            display.textContent = labels[value] || value;
+          }
+          updateCameraPreview();
+          updateAngleSweepCount();
+        }
         document.addEventListener('DOMContentLoaded', () => {
+
+          const defaultKey = '46601ee902014b92887c48ea0c40ff52';
+          const configKey = window.CONFIG?.BRIA_API_KEY;
+
+          if (!configKey || configKey === defaultKey || configKey.includes('YOUR_API_KEY')) {
+            // Show API key modal on load
+            document.getElementById('api-key-modal').style.display = 'flex';
+          } else {
+            // Valid key exists, initialize normally
+            api = new BriaFIBOAPI(configKey);
+            document.getElementById('object-section').style.display = 'block';
+            console.log('API initialized with existing key');
+          }
+
           // init API automatically if config provided
           if (window.CONFIG && window.CONFIG.BRIA_API_KEY && !window.CONFIG.BRIA_API_KEY.includes('YOUR_API_KEY')) {
             api = new BriaFIBOAPI(window.CONFIG.BRIA_API_KEY);
@@ -848,33 +1022,83 @@
           const tiltSweep = document.getElementById('enable-tilt-sweep')?.checked;
           const zoomSweep = document.getElementById('enable-zoom-sweep')?.checked;
 
-          let count = 1;
+          let autoSweepCount = 1;
           const detail = [];
 
-          if (rotationSweep) { count *= 5; detail.push('Rotation: 5'); } else { detail.push('Rotation: 1'); }
-          if (tiltSweep) { count *= 3; detail.push('Tilt: 3'); } else { detail.push('Tilt: 1'); }
-          if (zoomSweep) { count *= 3; detail.push('Zoom: 3'); } else { detail.push('Zoom: 1'); }
+          if (rotationSweep) {
+            autoSweepCount *= 5;
+            detail.push('Rotation: 5');
+          } else {
+            detail.push('Rotation: 1');
+          }
+
+          if (tiltSweep) {
+            autoSweepCount *= 3;
+            detail.push('Tilt: 3');
+          } else {
+            detail.push('Tilt: 1');
+          }
+
+          if (zoomSweep) {
+            autoSweepCount *= 3;
+            detail.push('Zoom: 3');
+          } else {
+            detail.push('Zoom: 1');
+          }
 
           const selectedLighting = document.querySelectorAll('.lighting-presets input[type="checkbox"]:checked').length || 1;
-          count *= selectedLighting;
+          autoSweepCount *= selectedLighting;
           detail.push(`Lighting: ${selectedLighting}`);
 
+          // ==========================================
+          // CALCULATE FINAL COUNT (Auto or Manual)
+          // ==========================================
+          let finalCount;
+          let manualQueueTotal = 0;
+
+          if (manualAngleQueue.length > 0) {
+            // Manual mode: count queued angles × their lighting
+            manualAngleQueue.forEach(item => {
+              manualQueueTotal += item.lighting_directions.length;
+            });
+            finalCount = manualQueueTotal;
+          } else {
+            // Auto sweep mode
+            finalCount = autoSweepCount;
+          }
+
+          // ==========================================
+          // UPDATE UI ELEMENTS
+          // ==========================================
           const angleCountEl = document.getElementById('angle-sweep-count');
           const angleDetailEl = document.getElementById('angle-sweep-detail');
-          if (angleCountEl) angleCountEl.textContent = count;
-          if (angleDetailEl) angleDetailEl.textContent = detail.join(' × ') + ` = ${count} variations`;
-
           const totalVariationsEl = document.getElementById('total-variations');
           const estimatedTimeEl = document.getElementById('estimated-time');
-          if (totalVariationsEl) totalVariationsEl.textContent = count;
+
+          if (angleCountEl) angleCountEl.textContent = autoSweepCount;
+
+          if (angleDetailEl) {
+            if (manualAngleQueue.length > 0) {
+              angleDetailEl.textContent = `Manual: ${manualAngleQueue.length} angles × lighting = ${manualQueueTotal} variations`;
+            } else {
+              angleDetailEl.textContent = detail.join(' × ') + ` = ${autoSweepCount} variations`;
+            }
+          }
+
+          if (totalVariationsEl) totalVariationsEl.textContent = finalCount;
+
           if (estimatedTimeEl) {
-            const estimatedMinutes = Math.ceil((count * 15) / 60); // 15s per image
+            const estimatedMinutes = Math.ceil((finalCount * 15) / 60); // 15s per image
             estimatedTimeEl.textContent = estimatedMinutes;
           }
 
           updateLightingCount();
-        }
 
+          // Update mode indicator if it exists
+          if (typeof updateGenerationModeIndicator === 'function') {
+            updateGenerationModeIndicator();
+          }
+        }
         function updateLightingCount() {
           const checkedLighting = document.querySelectorAll('.lighting-presets input[type="checkbox"]:checked').length;
           const lightingCountEl = document.getElementById('lighting-count');
@@ -1162,6 +1386,270 @@
               '</ul>';
           }
         }
+
+        function setCustomAPIKey() {
+          const userKey = document.getElementById('user-api-key').value.trim();
+
+          if (!userKey) {
+            alert('Please enter a valid API key');
+            return;
+          }
+
+          if (userKey.length < 20) {
+            alert('Invalid API key format. Please check and try again.');
+            return;
+          }
+
+          // Update CONFIG
+          window.CONFIG.BRIA_API_KEY = userKey;
+
+          // Reinitialize API with new key
+          api = new BriaFIBOAPI(userKey);
+
+          // Show success message
+          const toast = document.createElement('div');
+          toast.style.cssText = `
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+    z-index: 10000;
+    font-weight: 600;
+  `;
+          toast.textContent = 'Custom API key configured successfully!';
+          document.body.appendChild(toast);
+          setTimeout(() => toast.remove(), 3000);
+
+          // Hide modal
+          document.getElementById('api-key-modal').style.display = 'none';
+
+          // Show object section
+          document.getElementById('object-section').style.display = 'block';
+
+          console.log('API initialized with custom key');
+        }
+
+        function useDemoAPIKey() {
+          const demoKey = '46601ee902014b92887c48ea0c40ff52';
+
+          // Use demo key from config.js
+          window.CONFIG.BRIA_API_KEY = demoKey;
+          api = new BriaFIBOAPI(demoKey);
+
+          // Warning toast
+          const toast = document.createElement('div');
+          toast.style.cssText = `
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(245, 158, 11, 0.4);
+    z-index: 10000;
+    font-weight: 600;
+  `;
+          toast.textContent = 'Using demo key (may be rate-limited or expired)';
+          document.body.appendChild(toast);
+          setTimeout(() => toast.remove(), 4000);
+
+          // Hide modal
+          document.getElementById('api-key-modal').style.display = 'none';
+
+          // Show object section
+          document.getElementById('object-section').style.display = 'block';
+
+          console.log('API initialized with demo key');
+        }
+
+        let manualAngleQueue = [];
+
+        // Add current slider settings to queue
+        function addCurrentAngleToQueue() {
+          const rotation = parseInt(document.getElementById('rotation-slider').value);
+          const tilt = parseInt(document.getElementById('tilt-slider').value);
+          const zoom = parseInt(document.getElementById('zoom-slider').value);
+
+          // Get selected lighting
+          const lightingCheckboxes = document.querySelectorAll('.lighting-presets input[type="checkbox"]:checked');
+          const lightingDirections = Array.from(lightingCheckboxes).map(cb => cb.value);
+
+          if (lightingDirections.length === 0) {
+            alert('Please select at least one lighting direction before adding to queue');
+            return;
+          }
+
+          // Get advanced params
+          const advancedMods = getAdvancedModifications();
+
+          // Create queue item
+          const queueItem = {
+            id: Date.now(),
+            rotation_degrees: rotation,
+            tilt_degrees: tilt,
+            zoom_level: zoom,
+            lighting_directions: lightingDirections,
+            background: document.querySelector('input[name="background"]:checked')?.value || 'white-studio',
+            focal_length: document.querySelector('input[name="focal-length"]:checked')?.value || 'standard',
+            advanced: advancedMods,
+            label: formatRTZ(rotation, tilt, zoom)
+          };
+
+          manualAngleQueue.push(queueItem);
+          // Update UI
+          updateAngleSweepCount();
+          updateQueueDisplay();
+
+          // Success feedback
+          showToast(`Added: ${queueItem.label}`, 'success');
+        }
+
+        // Remove item from queue
+        function removeFromQueue(itemId) {
+          manualAngleQueue = manualAngleQueue.filter(item => item.id !== itemId);
+          updateQueueDisplay();
+          showToast('Removed from queue', 'info');
+        }
+
+        // Clear entire queue
+        function clearAngleQueue() {
+          if (manualAngleQueue.length === 0) {
+            return;
+          }
+
+          if (confirm(`Clear all ${manualAngleQueue.length} queued angles?`)) {
+            manualAngleQueue = [];
+            updateQueueDisplay();
+            showToast('Queue cleared', 'info');
+          }
+        }
+
+        // Update queue display UI
+        function updateQueueDisplay() {
+          const emptyState = document.getElementById('queue-empty-state');
+          const queueItems = document.getElementById('queue-items');
+          const queueCount = document.getElementById('queue-count');
+          const queueTotal = document.getElementById('queue-total-images');
+          const lightingMultiplier = document.getElementById('queue-lighting-multiplier');
+
+          if (manualAngleQueue.length === 0) {
+            emptyState.style.display = 'block';
+            queueItems.style.display = 'none';
+            queueCount.textContent = '0';
+            queueTotal.textContent = '0';
+            return;
+          }
+
+          emptyState.style.display = 'none';
+          queueItems.style.display = 'block';
+
+          // Calculate total images
+          let totalImages = 0;
+          manualAngleQueue.forEach(item => {
+            totalImages += item.lighting_directions.length;
+          });
+
+          // Update counts
+          queueCount.textContent = manualAngleQueue.length;
+          queueTotal.textContent = totalImages;
+
+          // Average lighting count (for display)
+          const avgLighting = (totalImages / manualAngleQueue.length).toFixed(1);
+          lightingMultiplier.textContent = avgLighting;
+
+          // Render queue items
+          queueItems.innerHTML = manualAngleQueue.map((item, index) => `
+    <div class="queue-item">
+      <div class="queue-item-params">
+        <span class="queue-item-badge">#${index + 1}</span>
+        <strong>${item.label}</strong>
+        <span style="color: var(--text-tertiary); margin-left: 12px;">
+          ${item.lighting_directions.join(', ')}
+        </span>
+        <span style="color: var(--text-tertiary); margin-left: 12px;">
+          (${item.lighting_directions.length} variants)
+        </span>
+      </div>
+      <button 
+        class="queue-item-remove" 
+        onclick="removeFromQueue(${item.id})"
+        title="Remove this angle"
+      >
+        ✕
+      </button>
+    </div>
+  `).join('');
+          updateGenerationModeIndicator();
+          updateAngleSweepCount();
+        }
+
+        // Toast notification helper
+        function showToast(message, type = 'success') {
+          const colors = {
+            success: 'linear-gradient(135deg, #10b981, #059669)',
+            info: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+            warning: 'linear-gradient(135deg, #f59e0b, #d97706)',
+            error: 'linear-gradient(135deg, #ef4444, #dc2626)'
+          };
+
+          const toast = document.createElement('div');
+          toast.style.cssText = `
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: ${colors[type] || colors.success};
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+    font-weight: 600;
+    font-size: 0.9rem;
+    animation: slideInUp 0.3s ease-out;
+  `;
+          toast.textContent = message;
+          document.body.appendChild(toast);
+
+          setTimeout(() => {
+            toast.style.animation = 'slideOutDown 0.3s ease-in';
+            setTimeout(() => toast.remove(), 300);
+          }, 2500);
+        }
+
+        // Initialize queue display on load
+        document.addEventListener('DOMContentLoaded', () => {
+          updateQueueDisplay();
+        });
+
+
+        function updateGenerationModeIndicator() {
+          const modeIcon = document.getElementById('mode-icon');
+          const modeTitle = document.getElementById('mode-title');
+          const modeDescription = document.getElementById('mode-description');
+          const modeTip = document.getElementById('mode-tip');
+
+          if (manualAngleQueue.length > 0) {
+            // Manual Queue Mode
+            modeTitle.textContent = 'Manual Queue Mode';
+            modeTitle.style.color = 'var(--primary)';
+            modeDescription.textContent = `${manualAngleQueue.length} custom angles queued for generation`;
+            modeTip.textContent = 'Your custom angles will be generated with locked seed for consistency';
+          } else {
+            // Auto Sweep Mode
+            modeTitle.textContent = 'Auto Sweep Mode';
+            modeTitle.style.color = 'var(--accent)';
+            modeDescription.textContent = 'Using parameter sweeps from toggles above';
+            modeTip.textContent = 'Add custom angles to queue for manual control, or use sweeps for batch generation';
+          }
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+          updateGenerationModeIndicator();
+        });
       </script>
   </body>
 </div>
