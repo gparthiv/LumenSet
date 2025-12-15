@@ -196,8 +196,8 @@ FIBO's **JSON-native architecture** enables:
 ### Local Development
 ```bash
 # 1. Clone repository
-git clone https://github.com/YOUR_USERNAME/fibo-dataforge.git
-cd fibo-dataforge
+git clone https://github.com/YOUR_USERNAME/LumenSet.git
+cd LumenSet
 
 # 2. Configure API key
 # Edit config.js line 11, or create .env file:
@@ -213,7 +213,7 @@ open http://localhost:8000
 
 ### Project Structure
 ```
-fibo-dataforge/
+LumenSet/
 ├── index.html              # Main UI
 ├── style.css               # Professional dark theme styling
 ├── config.js               # API configuration
