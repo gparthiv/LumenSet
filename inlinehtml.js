@@ -78,7 +78,7 @@ function updateZoomValue(value) {
 // --------------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
 
-  const defaultKey = '46601ee902014b92887c48ea0c40ff52';
+  const defaultKey = '85ac20704c3149dc902dab0c727c1995';
   const configKey = window.CONFIG?.BRIA_API_KEY;
 
   if (!configKey || configKey === defaultKey || configKey.includes('YOUR_API_KEY')) {
@@ -525,7 +525,7 @@ function setCustomAPIKey() {
 }
 
 function useDemoAPIKey() {
-  const demoKey = '46601ee902014b92887c48ea0c40ff52';
+  const demoKey = '85ac20704c3149dc902dab0c727c1995';
   window.CONFIG.BRIA_API_KEY = demoKey;
   api = new BriaFIBOAPI(demoKey);
   showToast('Using demo key');

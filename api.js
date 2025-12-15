@@ -8,7 +8,7 @@ class BriaFIBOAPI {
     this.requestQueue = [];
     this.processing = false;
     this.rateLimitDelay = 6000; // 6 seconds between requests (10/min)
-    this.pollInterval = 2000; // Poll every 2 seconds
+    this.pollInterval = 5000; // Poll every 2 seconds
     this.maxPollAttempts = 60; // 2 minutes timeout
   }
 
@@ -66,6 +66,11 @@ class BriaFIBOAPI {
 
     while (attempts < this.maxPollAttempts) {
       try {
+        // ADD DELAY BEFORE EACH STATUS CHECK
+        if (attempts > 0) {
+          await new Promise(r => setTimeout(r, this.pollInterval));
+        }
+
         const response = await fetch(statusUrl, {
           headers: { 'api_token': this.apiKey }
         });
@@ -86,10 +91,23 @@ class BriaFIBOAPI {
           }
         }
 
-        await new Promise(r => setTimeout(r, this.pollInterval));
         attempts++;
 
       } catch (error) {
+        // ADD EXPONENTIAL BACKOFF FOR NETWORK ERRORS
+        if (error.message.includes('Failed to fetch') ||
+          error.message.includes('CORS') ||
+          error.message.includes('Network')) {
+
+          console.warn(`Network error on attempt ${attempts}, retrying with backoff...`);
+
+          // Exponential backoff: 5s, 10s, 20s, etc.
+          const backoffDelay = Math.min(5000 * Math.pow(2, attempts), 30000);
+          await new Promise(r => setTimeout(r, backoffDelay));
+          attempts++;
+          continue;
+        }
+
         throw new Error(`Polling error: ${error.message}`);
       }
     }
