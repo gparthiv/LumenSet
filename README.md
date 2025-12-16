@@ -6,7 +6,9 @@
 > Deterministic, reproducible, ML-ready visual datasets using JSON-native prompts
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-success?style=for-the-badge&logo=vercel)](https://lumenset.vercel.app/)
-[![Video](https://img.shields.io/badge/Watch-Demo%20Video-red?style=for-the-badge&logo=youtube)](https://youtube.com/your-video-link)
+[![Video](https://img.shields.io/badge/Watch-Demo%20Video-red?style=for-the-badge&logo=youtube)](https://youtu.be/0j5UoJoY3Rc)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+
 ---
 
 ## 🎯 The Problem
@@ -39,7 +41,7 @@ Computer vision and ML projects require **thousands of training images** with co
 
 ## 🎥 Demo Video
 
-**[▶️ Watch 3-Minute Demo on YouTube](https://youtube.com/your-video-link)**
+**[▶️ Watch 3-Minute Demo on YouTube](https://youtu.be/0j5UoJoY3Rc)**
 
 ---
 
@@ -397,7 +399,7 @@ Solo Developer | ML Engineer | Computer Vision Enthusiast
 
 - **Issues:** [GitHub Issues](https://github.com/gparthiv/LumenSet/issues)
 - **Email:** g.parthiv119@gmail.com
-- **Hackathon:** [DevPost Submission](https://bria-ai.devpost.com/submissions/XXXXX)
+- **Hackathon:** [DevPost Submission](https://devpost.com/software/lumenset/)
 
 ---
 
