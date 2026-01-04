@@ -6,8 +6,15 @@
 > Deterministic, reproducible, ML-ready visual datasets using JSON-native prompts
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-success?style=for-the-badge&logo=vercel)](https://lumenset.vercel.app/)
+<br>
+
+**_(currently offline — API security change requires backend)_**
+
+<br>
+
 [![Video](https://img.shields.io/badge/Watch-Demo%20Video-red?style=for-the-badge&logo=youtube)](https://youtu.be/0j5UoJoY3Rc)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](./LICENSE)
+
 
 ---
 
@@ -47,12 +54,15 @@ Computer vision and ML projects require **thousands of training images** with co
 
 ## 🚀 Live Demo
 
-**👉 [lumenset.vercel.app](https://lumenset.vercel.app/)**
+**👉 [lumenset.vercel.app](https://lumenset.vercel.app/)**  
+_*(currently offline — API security change now requires a backend service)*_
 
-*Try it yourself:*
+> You can still explore the project via the demo video and full source code below.
+
+*Try it yourself (when live again):*
 1. Enter any object description (e.g., "ceramic coffee mug")
 2. Configure camera angles and lighting
-3. Generate a small dataset (4-8 images)
+3. Generate a small dataset (4–8 images)
 4. Download the ZIP and inspect metadata
 
 ---
