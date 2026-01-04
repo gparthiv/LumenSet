@@ -6,7 +6,7 @@
 const CONFIG = {
     // Bria API Configuration
     // Replace with your actual API key before deployment
-    BRIA_API_KEY: '85ac20704c3149dc902dab0c727c1995', // Directly in code
+    BRIA_API_KEY: 'ad0c4b493b564d62adf304e7cae30bc3', // Directly in code
     APP_MODE: 'production',
 
     // Application Settings
@@ -29,6 +29,6 @@ const CONFIG = {
 window.CONFIG = CONFIG;
 
 // Validation on load
-if (CONFIG.BRIA_API_KEY === '85ac20704c3149dc902dab0c727c1995') {
+if (CONFIG.BRIA_API_KEY === 'ad0c4b493b564d62adf304e7cae30bc3') {
     console.warn('BRIA_API_KEY not configured in config.js');
 }
